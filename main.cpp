@@ -185,14 +185,44 @@ public:
     }
 
     bool operator> (Vector v){
-        
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        if (this->length() > v.length()) return true;
+
+        return false;
     }
+
+    bool operator>= (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        if (this->length() >= v.length()) return true;
+
+        return false;
+    }
+
+    bool operator< (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        if (this->length() < v.length()) return true;
+
+        return false;
+    }
+
+    bool operator<= (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        if (this->length() <= v.length()) return true;
+
+        return false;
+    }
+
+
 
 };
 
 
 int main() {
     Vector v(4, 1., 2., 3., 0.);
-    Vector w(3, 1, 2, 3);
+    Vector w(4, 1., 2., 3., 5.);
     return 0;
 }
