@@ -7,10 +7,8 @@ int main() {
     Vector v(4, 1., 2., 3., 0.);
     Vector w(4, 1., 2., 3., 5.);
 
-    try {
-        v = v / 0;
-    } catch(ZeroDivisionError& e){
-        std::cout << e.what() << std::endl;
+    for (int i = 0; i < 100; i++){
+        std::cout << Vector::randVfloat(2, -5, 5) << std::endl;
     }
 
 

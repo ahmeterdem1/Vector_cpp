@@ -17,6 +17,8 @@
 #define CYAN "\033[0;36m"
 #define WHITE "\033[0;37m"
 
+#define unimportant_divisor 3137
+
 int Random(){
     // For this function to be useful, srand() must be
     // seeded in the main with time(0) or something.
@@ -124,6 +126,70 @@ public:
 
 
         return coefficient * v;
+    }
+
+    Vector unit(){
+        // The reason I precalculate the length here and store it in a var
+        // is that, I don't want to calculate it twice. A small optimization.
+        double length = this->length();
+        if (length == 0) return *this;
+
+        return *this / length;
+    }
+
+    static Vector randVint(int dim = 2, long low = 0, long high = 10){
+        // Setting limiter "high" too high will not work the intended way
+        // Same goes for wide ranges
+
+        // Low included, high excluded
+        if (low == high or low > high or dim < 1) throw RangeError();
+
+        Vector result(dim);
+        long range = high - low;
+        long temp;
+        for (int i = 0; i < dim; i++){
+            // This is to increase randomness
+            temp = (Random() % range + Random() % unimportant_divisor % range + Random() % range) % range;
+            result.values[i] = (temp + low);
+        }
+
+        return result;
+    }
+
+    static Vector randVfloat(int dim = 2, float low = 0, float high = 10){
+        // So ratio of random integers are random floats
+        if (low == high or low > high or dim < 1) throw RangeError();
+
+        Vector result(dim);
+        long range = high - low;
+
+        long rand_temp;
+        double temp;
+
+        for (int i = 0; i < dim; i++){
+            rand_temp = Random() % Random();
+            long divisor = Random() % Random();
+
+            while (divisor < rand_temp){
+                divisor = Random() % Random();
+            }
+            temp = rand_temp * range;
+            result.values[i] = (temp / divisor) + low;
+        }
+
+        return result;
+    }
+
+    static Vector randVbool(int dim = 2){
+        if (dim < 1) throw RangeError();
+
+        Vector result(dim);
+
+        for (int i = 0; i < dim; i++){
+            result.values[i] = (Random() % 2 + Random() % unimportant_divisor + Random() % 2) % 2;
+        }
+
+        return result;
     }
 
     Vector pop(int order = -1){
