@@ -8,6 +8,15 @@
 #ifndef VECTOR_CPP_VECTOR_H
 #define VECTOR_CPP_VECTOR_H
 
+#define BLACK "\033[0;30m"
+#define RED "\033[0;31m"
+#define GREEN "\033[0;32m"
+#define YELLOW "\033[0;33m"
+#define BLUE "\033[0;34m"
+#define MAGENTA "\033[0;35m"
+#define CYAN "\033[0;36m"
+#define WHITE "\033[0;37m"
+
 int Random(){
     // For this function to be useful, srand() must be
     // seeded in the main with time(0) or something.
@@ -25,7 +34,18 @@ public:
     }
 
     char* what(){
-        return "Dimension of arguments must match.";
+        return RED "DimensionError: Dimension of arguments must match." WHITE;
+    }
+};
+
+class RangeError : public std::exception {
+public:
+    RangeError(){
+        std::exception();
+    }
+
+    char* what(){
+        return RED "RangeError: Argument out of allowed range" WHITE;
     }
 };
 
@@ -35,7 +55,7 @@ public:
         std::exception();
     }
     char* what(){
-        return "Division by zero not viable";
+        return RED "ZeroDivisionError: Division by zero not viable" WHITE;
     }
 };
 
@@ -46,6 +66,8 @@ public:
     float *values;
 
     Vector(int dim, ...){
+
+        if (dim < 1) throw RangeError();
         this->dimension = dim;
 
         // Here I do the trick; at above lines, I have created a float ptr.
@@ -62,7 +84,7 @@ public:
         values = temp_values;
     }
 
-    void show(){
+    void show() const{
         std::cout << "[ ";
         for (int i = 0; i < this->dimension; i++){
             std::cout << this->values[i] << " ";
@@ -73,7 +95,7 @@ public:
         std::cout << "]" << std::endl;
     }
 
-    double length(){
+    double length() const{
         double temp = 0;
         for (int i = 0; i < this->dimension; i++){
             temp += this->values[i] * this->values[i];
@@ -82,7 +104,7 @@ public:
         return sqrt(temp);
     }
 
-    float dot(Vector v){
+    float dot(Vector v) const{
         if (v.dimension != this->dimension) throw DimensionError();
 
         float temp = 0;
@@ -102,6 +124,73 @@ public:
 
 
         return coefficient * v;
+    }
+
+    Vector pop(int order = -1){
+        // I cannot use the keyword "this" in the argument definitions, so I just do it here
+        if (order == -1) {
+            order = this->dimension-1;
+        } else if (order < -1 or order >= this->dimension){
+            throw RangeError();
+        } else if (this->dimension == 1){
+            return Vector(0);
+        }
+
+        // This function does not change the original vector
+        // Simply creates another one with proper values and dimension
+
+        Vector result(this->dimension - 1);
+
+        for (int i = 0; i < this->dimension - 1; i++){
+            if (i < order){
+                result.values[i] = this->values[i];
+            } else {
+                result.values[i] = this->values[i + 1];
+            }
+        }
+
+        return result;
+    }
+
+    Vector append(float value){
+        Vector result(this->dimension + 1);
+
+        for (int i = 0; i < this->dimension; i++){
+            result.values[i] = this->values[i];
+        }
+
+        result.values[this->dimension] = value;
+
+        return result;
+    }
+
+    Vector insert(int order = -1, float value = 0){
+        if (order < -1 or order > this->dimension) throw RangeError();
+        if (order == -1) order = this->dimension;
+
+        Vector result(this->dimension + 1);
+
+        for (int i = 0; i < this->dimension + 1; i++){
+            if (i < order){
+                result.values[i] = this->values[i];
+            } else if (i == order) {
+                result.values[i] = value;
+            } else {
+                result.values[i] = this->values[i - 1];
+            }
+        }
+
+        return result;
+    }
+
+    Vector reverse(){
+        Vector result(this->dimension);
+
+        for (int i = 0; i < this->dimension; i++){
+            result.values[i] = this->values[this->dimension - i - 1];
+        }
+
+        return result;
     }
 
     friend std::ostream& operator<< (std::ostream& output, Vector v){

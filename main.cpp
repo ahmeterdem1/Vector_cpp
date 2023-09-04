@@ -7,8 +7,12 @@ int main() {
     Vector v(4, 1., 2., 3., 0.);
     Vector w(4, 1., 2., 3., 5.);
 
-    w = v.proj(w);
+    try {
+        v = v / 0;
+    } catch(ZeroDivisionError& e){
+        std::cout << e.what() << std::endl;
+    }
 
-    std::cout << Random() << std::endl;
+
     return 0;
 }
