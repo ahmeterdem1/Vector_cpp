@@ -8,6 +8,16 @@
 #ifndef VECTOR_CPP_VECTOR_H
 #define VECTOR_CPP_VECTOR_H
 
+int Random(){
+    // For this function to be useful, srand() must be
+    // seeded in the main with time(0) or something.
+    // This is only for limited use, obviously.
+
+    srand(rand());
+    int next_random = rand();
+    return next_random;
+}
+
 class DimensionError : public std::exception {
 public:
     DimensionError(){
@@ -83,7 +93,19 @@ public:
         return temp;
     }
 
+    Vector proj(Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+        if (v.length() == 0) throw ZeroDivisionError();
+
+        float coefficient = this->dot(v);
+        coefficient /= (pow(v.length(), 2));
+
+
+        return coefficient * v;
+    }
+
     friend std::ostream& operator<< (std::ostream& output, Vector v){
+        // same as .show()
         output << "[ ";
         for (int i = 0; i < v.dimension; i++){
             output << v.values[i] << " ";
@@ -134,49 +156,46 @@ public:
         return *this;
     }
 
-    Vector operator* (Vector v){
-        if (v.dimension != this->dimension) throw DimensionError();
+    friend Vector operator* (float c, Vector v){
 
-        Vector result(this->dimension);
+        Vector result(v.dimension);
 
-        for (int i = 0; i < this->dimension; i++){
-            result.values[i] = this->values[i] * v.values[i];
+        for (int i = 0; i < v.dimension; i++){
+            result.values[i] = c * v.values[i];
         }
 
         return result;
     }
 
-    Vector operator*= (Vector v){
-        if (v.dimension != this->dimension) throw DimensionError();
+    friend Vector operator*= (float c, Vector v){
 
-        for (int i = 0; i < this->dimension; i++){
-            this->values[i] = this->values[i] * v.values[i];
+        for (int i = 0; i < v.dimension; i++){
+            v.values[i] = c * v.values[i];
         }
-        return *this;
+
+        return v;
     }
 
-    Vector operator/ (Vector v){
-        if (v.dimension != this->dimension) throw DimensionError();
+    friend Vector operator/ (Vector v, float c){
+        if (c == 0) throw ZeroDivisionError();
 
-        Vector result(this->dimension);
+        Vector result(v.dimension);
 
-        for (int i = 0; i < this->dimension; i++){
-            if (v.values[i] == 0) throw ZeroDivisionError();
-            result.values[i] = this->values[i] / v.values[i];
+        for (int i = 0; i < v.dimension; i++){
+            result.values[i] = v.values[i] / c;
         }
 
         return result;
     }
 
-    Vector operator/= (Vector v){
-        if (v.dimension != this->dimension) throw DimensionError();
+    friend Vector operator/= (Vector v, float c){
+        if (c == 0) throw ZeroDivisionError();
 
-        for (int i = 0; i < this->dimension; i++){
-            if (v.values[i] == 0) throw ZeroDivisionError();
-
-            this->values[i] = this->values[i] / v.values[i];
+        for (int i = 0; i < v.dimension; i++){
+            v.values[i] = v.values[i] / c;
         }
-        return *this;
+
+        return v;
     }
 
     bool operator== (Vector v){
@@ -222,8 +241,96 @@ public:
     }
 
 
+    Vector operator& (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        Vector result(this->dimension);
+
+        for (int i = 0; i < this->dimension; i++){
+            result.values[i] = (static_cast<int>(v.values[i]) & static_cast<int>(this->values[i]));
+        }
+
+        return result;
+    }
+
+    Vector operator&= (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < this->dimension; i++){
+            this->values[i] = (static_cast<int>(v.values[i]) & static_cast<int>(this->values[i]));
+        }
+
+        return *this;
+    }
+
+    bool operator&& (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < this->dimension; i++){
+            if (not (v.values[i] && this->values)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    Vector operator| (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        Vector result(this->dimension);
+
+        for (int i = 0; i < this->dimension; i++){
+            result.values[i] = (static_cast<int>(v.values[i]) | static_cast<int>(this->values[i]));
+        }
+
+        return result;
+    }
+
+    Vector operator|= (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < this->dimension; i++){
+            this->values[i] = (static_cast<int>(v.values[i]) | static_cast<int>(this->values[i]));
+        }
+
+        return *this;
+    }
+
+    bool operator|| (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < this->dimension; i++){
+            if (not (v.values[i] || this->values)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    Vector operator^ (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        Vector result(this->dimension);
+
+        for (int i = 0; i < this->dimension; i++){
+            result.values[i] = (static_cast<int>(v.values[i]) ^ static_cast<int>(this->values[i]));
+        }
+
+        return result;
+    }
+
+    Vector operator^= (Vector v){
+        if (v.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < this->dimension; i++){
+            this->values[i] = (static_cast<int>(v.values[i]) ^ static_cast<int>(this->values[i]));
+        }
+
+        return *this;
+    }
 
 };
-
 
 #endif //VECTOR_CPP_VECTOR_H

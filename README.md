@@ -26,3 +26,13 @@ And I would like this library to be more high level
 than general C++ code. What I mean by that is like,
 having exception classes and _maybe_ some built in 
 logging.
+
+## Details
+
+There are some details that are important to know
+before using the library.
+
+&, | and ^ operations static cast to integer before
+applying the operation. Same for the assignment included
+versions of those. This casting is not done for bool 
+returning versions of these operators.
