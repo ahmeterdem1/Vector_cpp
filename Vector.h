@@ -489,6 +489,7 @@ public:
 
     static float determinant(int dim, Vector v_list[]){
         // Input must be a vector list whose last element is Vector(0)
+        if (dim < 1) throw RangeError();
 
         int amount = 0;
 
@@ -497,7 +498,7 @@ public:
             if (v_list[i].dimension != dim) throw DimensionError();
         }
 
-
+        if (dim == 1) return 1/v_list[0].values[0];
         if (dim == 2){
             return v_list[0].values[0] * v_list[1].values[1] - v_list[0].values[1] * v_list[1].values[0];
         }
@@ -530,6 +531,8 @@ public:
 
     static Vector cross(int dim, Vector v_list[]){
         // dim here is the vectors' dimension
+        if (dim < 2) throw RangeError();
+
         int amount = 0;
 
         for (int i = 0; i < dim - 1; i++){
