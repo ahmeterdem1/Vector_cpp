@@ -121,6 +121,20 @@ C++ is measured to be around 200 times faster.
 
 .insert() and .reverse() are not in python version
 
+### Randoms
+
+For .randVint(), 2d in range(10), python is 100 times faster.
+
+For .randVbool(), 2d, python is 150 times faster.
+
+For .randVfloat(), 2d in range(10), python is around 15 times
+faster.
+
+Python is faster in randoms because I use a custom random generation
+method in C++, which is probably slower. C++ is very close to python
+in floats even though I use an inner loop to generate divisor. But
+still, the loop most likely never gets entered.
+
 ### Save the data
 
 Vector initialization and savings to the memory will be the only

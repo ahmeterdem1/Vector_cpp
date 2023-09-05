@@ -2,14 +2,11 @@ from Vector import *
 import time
 
 if __name__ == "__main__":
-    v = Vector(1, 2, 3, 0)
     w = Vector(2, 3, 0, 1)
     begin = time.time()
 
-    stack = [Vector(1, 2, 3, 0) for k in range(10000)]
-    sum = Vector(0, 0, 0, 0)
-    for k in stack:
-        sum += k
+    v = Vector.randVfloat(2, 0, 10)
+
 
     end = time.time()
 
