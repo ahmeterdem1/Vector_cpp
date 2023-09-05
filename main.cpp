@@ -15,7 +15,11 @@ int main() {
     for (int i = 0; i < 10000; i++) {
         Vector v(4, 1., 2., 3., 0.);
         v_list[i] = &v;
+    }
 
+    Vector sum(4, 0., 0., 0., 0.);
+    for (int i = 0; i < 10000 ; i++){
+        sum += *v_list[i];
     }
     end = std::chrono::system_clock::now();
 

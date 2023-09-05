@@ -133,3 +133,12 @@ to be around 100 times.
 
 If we use lists instead of tuples, python is again 100 times slower.
 
+### A small combined operation
+
+A stack of vectors are created. Then these vectors are summed together.
+
+C++ is only around 25 times faster in this combined operation program.
+
+I still haven't coded the matrix part yet but it seems like C++ is fast
+enough to be worth coding in. But python is still fast enough.
+

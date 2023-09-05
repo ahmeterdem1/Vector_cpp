@@ -6,7 +6,10 @@ if __name__ == "__main__":
     w = Vector(2, 3, 0, 1)
     begin = time.time()
 
-    stack = (Vector(1, 2, 3, 0) for k in range(10000))
+    stack = [Vector(1, 2, 3, 0) for k in range(10000)]
+    sum = Vector(0, 0, 0, 0)
+    for k in stack:
+        sum += k
 
     end = time.time()
 
