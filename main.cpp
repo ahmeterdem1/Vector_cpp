@@ -5,19 +5,19 @@
 
 int main() {
     srand(unsigned(int(time(0))));
-    std::chrono::time_point<std::chrono::system_clock> begin, end;
-    Vector w(4, 2., 3., 0., 1.);
 
-    begin = std::chrono::system_clock::now();
+    Vector *v_list = new Vector[3];
 
-    for (int i = 0; i < 10000; i++){
-        Vector v = Vector::randVfloat(2, 0, 10);
-    }
-    end = std::chrono::system_clock::now();
+    Vector v(4, 1., 0., 0., 0.);
+    Vector w(4, 0., 1., 0., 0.);
+    Vector q(4, 0., 0., 0., 1.);
+    Vector p(4, 1., 2., 3., 4.);
 
-    std::chrono::duration<double> difference = end - begin;
+    v_list[0] = v;
+    v_list[1] = w;
+    v_list[2] = q;
 
-    std::cout << "Average time is: " << (difference.count() / 10000) << std::endl;
+    std::cout << Vector::cross(4, v_list) << std::endl;
 
     return 0;
 }

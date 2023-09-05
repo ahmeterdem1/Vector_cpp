@@ -67,9 +67,9 @@ public:
     int dimension;
     float *values;
 
-    Vector(int dim, ...){
+    Vector(int dim = 1, ...){
 
-        if (dim < 1) throw RangeError();
+        if (dim < 0) throw RangeError();
         this->dimension = dim;
 
         // Here I do the trick; at above lines, I have created a float ptr.
@@ -85,6 +85,7 @@ public:
         va_end(val);
         values = temp_values;
     }
+
 
     void show() const{
         std::cout << "[ ";
@@ -486,6 +487,90 @@ public:
         return *this;
     }
 
+    static float determinant(int dim, Vector v_list[]){
+        // Input must be a vector list whose last element is Vector(0)
+
+        int amount = 0;
+
+        for (int i = 0; i < dim; i++){
+            amount += 1;
+            if (v_list[i].dimension != dim) throw DimensionError();
+        }
+
+
+        if (dim == 2){
+            return v_list[0].values[0] * v_list[1].values[1] - v_list[0].values[1] * v_list[1].values[0];
+        }
+
+        Vector sub_list[dim - 1];
+        float result = 0;
+
+        for (int i = 0; i < dim; i++){
+            float factor = v_list[0].values[i];
+            if (factor == 0) continue;
+
+            for (int j = 1; j < dim; j++){
+                Vector temp(dim - 1);
+                int counter = 0;
+                for (int k = 0;  k < dim; k++){
+                    if (k != i){
+                        temp.values[k - counter] = v_list[j].values[k];
+                    } else {
+                        counter += 1;
+                    }
+                }
+                sub_list[j - 1] = temp;
+            }
+
+            result += Vector::determinant(dim - 1, sub_list) * pow(-1, i) * factor;
+        }
+
+        return result;
+    }
+
+    static Vector cross(int dim, Vector v_list[]){
+        // dim here is the vectors' dimension
+        int amount = 0;
+
+        for (int i = 0; i < dim - 1; i++){
+            amount += 1;
+            if (v_list[i].dimension != dim) throw DimensionError();
+        }
+
+        if (dim == 2){
+            Vector result(2);
+            // Just rotate it by 90 degrees.
+            result.values[0] = -v_list[0].values[0];
+            result.values[1] = v_list[0].values[1];
+            return result;
+        }
+
+        Vector sub_list[dim - 1];
+        Vector result(dim);
+
+        for (int i = 0; i < dim; i++){
+
+            for (int j = 0; j < dim - 1; j++){
+                Vector temp(dim - 1);
+                int counter = 0;
+                for (int k = 0;  k < dim; k++){
+                    if (k != i){
+                        temp.values[k - counter] = v_list[j].values[k];
+                    } else {
+                        counter += 1;
+                    }
+                }
+                sub_list[j] = temp;
+            }
+
+            result.values[i] = Vector::determinant(dim - 1, sub_list) * pow(-1, i);
+        }
+
+        return result;
+    }
+
 };
+
+
 
 #endif //VECTOR_CPP_VECTOR_H
