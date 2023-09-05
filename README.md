@@ -81,3 +81,55 @@ up to the inputted range.
 Why I don't use already existing libraries?
 
 I want to create my own.
+
+## Speed comparisons
+
+These are the results of speed comparisons between python
+and C++. Results are obtained by doing the operation 10000
+times then taking the average.
+
+All measurements are done on the same 4d vector(s).
+
+### Vector initialization
+
+C++ is around 100 times faster than python. Generated vectors
+are not saved to any data structure in this test.
+
+### Basic operations
+
+Add, subtract and multiply are all 100 times faster in C++.
+Division is 110 times faster in C++.
+
+& operation is only around 1.6 times faster in C++. A similar
+pattern is observed for | operation. It is only 1.35 times
+faster in C++.
+
+However, the old 100 times is regained for xor. C++ is again
+around 100 times faster there.
+
+### Other methods
+
+For .length(), C++ is 300 times faster.
+
+For .unit(), C++ is 110 times faster.
+
+.proj() is just around 20 times faster in C++.
+
+.pop() is measured by regenerating the same vector at each
+iteration. This is done because of the nature of pop in python.
+C++ is measured to be around 200 times faster.
+
+.insert() and .reverse() are not in python version
+
+### Save the data
+
+Vector initialization and savings to the memory will be the only
+test here. We will generate vectors and save these in stack memory
+in C++. Same goes for python. Python will use tuple as the stack type.
+
+Python is surprisingly 100 times faster. However the standard deviation
+is high. Low end is 70 times, high end is 145 times. Average looks like
+to be around 100 times.
+
+If we use lists instead of tuples, python is again 100 times slower.
+
