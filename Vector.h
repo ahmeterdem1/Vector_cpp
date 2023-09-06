@@ -19,6 +19,8 @@
 
 #define unimportant_divisor 3137
 
+// Helper functions
+
 int Random(){
     // For this function to be useful, srand() must be
     // seeded in the main with time(0) or something.
@@ -28,6 +30,46 @@ int Random(){
     int next_random = rand();
     return next_random;
 }
+
+std::string* split(std::string in, char limiter){
+    unsigned long len = in.length();
+    int delimiter = 0;
+    int amount = 0;
+
+    for (int i = 0; i < len; i++){
+        if (in[i] == limiter){
+            amount += 1;
+        }
+    }
+
+    std::string *res = new std::string[amount + 1];
+    int counter = 0;
+
+    for (int i = 0; i < len; i++){
+        if (in[i] == limiter){
+            std::string temp = "";
+            for (int j = delimiter; j < i; j++){
+                temp += in[j];
+            }
+            res[counter] = temp;
+            counter += 1;
+            delimiter = i + 1;
+        }
+        if (i == len - 1){
+            std::string temp = "";
+            for (int j = delimiter; j < len; j++){
+                temp += in[j];
+            }
+            res[counter] = temp;
+            counter += 1;
+        }
+    }
+    res[amount + 1] = "\0";
+
+    return res;
+}
+
+// Exception classes
 
 class DimensionError : public std::exception {
 public:
@@ -60,6 +102,8 @@ public:
         return RED "ZeroDivisionError: Division by zero not viable" WHITE;
     }
 };
+
+// Core
 
 class Vector {
 
@@ -572,6 +616,158 @@ public:
         return result;
     }
 
+};
+
+class Matrix {
+public:
+    std::string dimension;
+    int m;
+    int n;
+    Vector *rows;
+    // This is the default vector lis so that clang does not paint the line red
+    static Vector *_default[1];
+    // Arguments are going to be vectors just like in py version
+    // This time I am not using variatic args because "Vector" is non-POD, says clang...
+
+    Matrix(std::string dim = "0x0", Vector *v[] = _default) {
+        // First argument must be in the format
+        // Second argument must be a stack created pointer array.
+        std::string* temp = split(dim, 'x');
+        this->dimension = dim;
+        this->m = std::stoi(temp[0]); // amount of rows, aka vector
+        this->n = std::stoi(temp[1]); // amount of columns, aka vectors dimension
+
+        if (this->m < 0 or this->n < 0) throw DimensionError();
+
+        Vector* v_list = new Vector[this->m];
+
+        for (int i = 0; i < this->m; i++){
+            v_list[i] = *v[i];
+            if(v_list[i].dimension != this->n) throw DimensionError();
+        }
+
+        this->rows = v_list;
+
+    }
+
+    void show() {
+        for (int i = 0; i < this->m; i++){
+            std::cout << "[ ";
+            for (int j = 0; j < this->n; j++){
+                std::cout << this->rows[i].values[j] << " ";
+            }
+            std::cout << "]" << std::endl;
+        }
+    }
+
+    Matrix copy() {
+        Vector *temp[this->m];
+
+        for (int i = 0; i < this->m; i++){
+            // Vector template created
+            Vector *t = new Vector(this->n);
+            for (int j = 0; j < this->n; j++){
+                // Values filled
+                (*t).values[j] = this->rows[i].values[j];
+            }
+            // Mem address inserted
+            temp[i] = t;
+        }
+
+        Matrix result(this->dimension, temp);
+        // Clean the memory up I guess
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    friend std::ostream& operator<< (std::ostream& output, Matrix M){
+        for (int i = 0; i < M.m; i++){
+            output << "[ ";
+            for (int j = 0; j < M.n; j++){
+                output << M.rows[i].values[j] << " ";
+            }
+            output << "]" << std::endl;
+        }
+
+        return output;
+    }
+
+    Matrix operator+ (Matrix M) {
+        // Does this algorith result in a memory leak?
+        // Like a heap allocation is done here.
+        // And another one is done in the initialization.
+
+        // We create a vector list
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        Vector *temp[M.m];
+
+        for (int i = 0; i < M.m; i++){
+            // Vector template created
+            Vector *t = new Vector(M.n);
+            for (int j = 0; j < M.n; j++){
+                // Values filled
+                (*t).values[j] = this->rows[i].values[j] + M.rows[i].values[j];
+            }
+            // Mem address inserted
+            temp[i] = t;
+        }
+        Matrix result(M.dimension, temp);
+        // Clean the memory up I guess
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    Matrix operator+= (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < M.m; i++){
+            for(int j = 0; j < M.n; j++){
+                this->rows[i].values[j] += M.rows[i].values[j];
+            }
+        }
+
+        return *this;
+    }
+
+    Matrix operator- (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        // We create a vector list
+        Vector *temp[M.m];
+
+        for (int i = 0; i < M.m; i++){
+            // Vector template created
+            Vector *t = new Vector(M.n);
+            for (int j = 0; j < M.n; j++){
+                // Values filled
+                (*t).values[j] = this->rows[i].values[j] - M.rows[i].values[j];
+            }
+            // Mem address inserted
+            temp[i] = t;
+        }
+        Matrix result(M.dimension, temp);
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    Matrix operator-= (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < M.m; i++){
+            for(int j = 0; j < M.n; j++){
+                this->rows[i].values[j] -= M.rows[i].values[j];
+            }
+        }
+
+        return *this;
+    }
 };
 
 

@@ -82,6 +82,47 @@ Why I don't use already existing libraries?
 
 I want to create my own.
 
+### Matrices
+
+So, here is the thing. To create a matrix, you need a vector list.
+That vector list must consist of pointers of vectors. Matrix
+constructor will take these addresses and just use them.
+
+So when you create two matrices from the same list, these 2
+matrices are inherently the same. Change on one will result
+in the same change on the other.
+
+When creating lots of matrices with loops, create the vectors
+on the heap. Pass the list to the matrix, then delete the 
+initial vectors. Thats what I do in the +/- overloads. 
+
+Because I use the above said method, +/- operations do not
+affect both operands. It just creates and returns a completely
+different matrix.
+
+Main holder list for the vector group should be treated with
+the same caution.
+
+Change on one of the member vectors also results in the same
+change on the related matrix.
+
+That was unintentional and it is literally the most c++ thing 
+I have ever created...
+
+So I have introduced a copy method to solve this. This method
+completely seperates the returned matrix from the applied object.
+This seperation includes inner vectors. Copied matrices don't get
+affected by change on vectors too.
+
+#### Important summary
+
+If you pass the vector list from stack, it itself becomes the rows
+of the matrix. Therefore change on it will result on change on the
+matrix.
+
+If you pass the vector list from heap, you may delete it after
+initialization. It gets fully copied.
+
 ## Speed comparisons
 
 These are the results of speed comparisons between python
