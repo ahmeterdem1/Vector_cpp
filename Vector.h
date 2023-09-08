@@ -531,7 +531,10 @@ public:
         return *this;
     }
 
-    static float determinant(int dim, Vector v_list[]){
+    static float __determinant(int dim, Vector v_list[]){
+        // This method isn't supposed to be called on this class manually
+        // But if you want, you can
+
         // Input must be a vector list whose last element is Vector(0)
         if (dim < 1) throw RangeError();
 
@@ -567,7 +570,7 @@ public:
                 sub_list[j - 1] = temp;
             }
 
-            result += Vector::determinant(dim - 1, sub_list) * pow(-1, i) * factor;
+            result += Vector::__determinant(dim - 1, sub_list) * pow(-1, i) * factor;
         }
 
         return result;
@@ -610,7 +613,7 @@ public:
                 sub_list[j] = temp;
             }
 
-            result.values[i] = Vector::determinant(dim - 1, sub_list) * pow(-1, i);
+            result.values[i] = Vector::__determinant(dim - 1, sub_list) * pow(-1, i);
         }
 
         return result;
@@ -619,13 +622,18 @@ public:
 };
 
 class Matrix {
+
+private:
+    static Vector *_default[1];
+    // You are not meant to be creating empty matrices
+    // In case you do, you won't get any error messages
+
 public:
     std::string dimension;
     int m;
     int n;
     Vector *rows;
     // This is the default vector lis so that clang does not paint the line red
-    static Vector *_default[1];
     // Arguments are going to be vectors just like in py version
     // This time I am not using variatic args because "Vector" is non-POD, says clang...
 
@@ -768,6 +776,195 @@ public:
 
         return *this;
     }
+
+    bool operator== (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < M.m; i++){
+            for(int j = 0; j < M.n; j++){
+                if (this->rows[i].values[j] != M.rows[i].values[j]){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    // Below logical operators are meant to be only applicable to
+    // bool valued matrices. Therefore, a static cast to integer is used.
+    // Same thing is done in vectors too.
+    Matrix operator& (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        // We create a vector list
+        Vector *temp[M.m];
+
+        for (int i = 0; i < M.m; i++){
+            // Vector template created
+            Vector *t = new Vector(M.n);
+            for (int j = 0; j < M.n; j++){
+                // Values filled
+                (*t).values[j] = static_cast<int>(this->rows[i].values[j]) & static_cast<int>(M.rows[i].values[j]);
+            }
+            // Mem address inserted
+            temp[i] = t;
+        }
+        Matrix result(M.dimension, temp);
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    Matrix operator&= (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < M.m; i++){
+            for(int j = 0; j < M.n; j++){
+                this->rows[i].values[j] = static_cast<int>(M.rows[i].values[j]) & static_cast<int>(this->rows[i].values[j]);
+            }
+        }
+
+        return *this;
+    }
+
+    Matrix operator| (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        // We create a vector list
+        Vector *temp[M.m];
+
+        for (int i = 0; i < M.m; i++){
+            // Vector template created
+            Vector *t = new Vector(M.n);
+            for (int j = 0; j < M.n; j++){
+                // Values filled
+                (*t).values[j] = static_cast<int>(this->rows[i].values[j]) | static_cast<int>(M.rows[i].values[j]);
+            }
+            // Mem address inserted
+            temp[i] = t;
+        }
+        Matrix result(M.dimension, temp);
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    Matrix operator|= (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < M.m; i++){
+            for(int j = 0; j < M.n; j++){
+                this->rows[i].values[j] = static_cast<int>(M.rows[i].values[j]) | static_cast<int>(this->rows[i].values[j]);
+            }
+        }
+
+        return *this;
+    }
+
+    Matrix operator^ (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        // We create a vector list
+        Vector *temp[M.m];
+
+        for (int i = 0; i < M.m; i++){
+            // Vector template created
+            Vector *t = new Vector(M.n);
+            for (int j = 0; j < M.n; j++){
+                // Values filled
+                (*t).values[j] = static_cast<int>(this->rows[i].values[j]) ^ static_cast<int>(M.rows[i].values[j]);
+            }
+            // Mem address inserted
+            temp[i] = t;
+        }
+        Matrix result(M.dimension, temp);
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    Matrix operator= (Matrix M) {
+        if (M.dimension != this->dimension) throw DimensionError();
+
+        for (int i = 0; i < M.m; i++){
+            for(int j = 0; j < M.n; j++){
+                this->rows[i].values[j] = static_cast<int>(M.rows[i].values[j]) ^ static_cast<int>(this->rows[i].values[j]);
+            }
+        }
+
+        return *this;
+    }
+
+    float determinant() {
+        // This is supposed to be called manually, obviously.
+
+        Vector v_list[this->m];
+
+        for (int i = 0; i < this->m; i++){
+            v_list[i] = Vector(this->n);
+            for (int j = 0; j < this->n; j++) {
+                v_list[i].values[j] = this->rows[i].values[j];
+            }
+        }
+
+        return Vector::__determinant(this->m, v_list);
+    }
+
+    Matrix transpose() {
+
+        Vector *temp[this->m];
+
+        for (int i = 0; i < this->m; i++){
+            Vector *t = new Vector(this->n);
+
+            for (int j = 0; j < this->n; j++) {
+                (*t).values[j] = this->rows[j].values[i];
+            }
+
+            temp[i] = t;
+        }
+
+        Matrix result(this->dimension, temp);
+
+        for (Vector *v : temp){
+            delete v;
+        }
+        return result;
+    }
+
+    static Matrix randMint(int m = 2, int n = 2, long low = 0, long high = 10){
+        if (m < 0 or n < 0 or low > high) throw RangeError();
+
+        Vector *temp[m];
+        for (int i = 0; i < m; i++){
+            *temp[i] = Vector::randVint(n, low, high);
+        }
+        std::string dimension = std::to_string(m) + "x" + std::to_string(n);
+        Matrix result(dimension, temp);
+
+        return result;
+    }
+
+    static Matrix randMfloat(int m = 2, int n = 2, float low = 0, float high = 10) {
+        if (m < 0 or n < 0 or low > high) throw RangeError();
+
+        Vector *temp[m];
+
+        for (int i = 0; i < m; i++) {
+            *temp[i] = Vector::randVfloat(n, low, high);
+        }
+
+        std::string dimension = std::to_string(m) + "x" + std::to_string(n);
+        Matrix result(dimension, temp);
+
+        return result;
+    }
+
+
 };
 
 

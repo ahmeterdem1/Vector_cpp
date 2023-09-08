@@ -30,5 +30,13 @@ int main() {
     // m and n also get affected by vectors changes.
     // c still remains untouched.
 
+    Matrix test(); // Empty matrix
+
+    std::cout << test << std::endl; // outputs 1
+
+    std::cout << c.determinant() << std::endl; // determinant
+
+    std::cout << m.transpose() << std::endl; // transpose
+
     return 0;
 }
