@@ -38,6 +38,30 @@ int main() {
     std::cout << Matrix::identity(3) * c << std::endl;
     std::cout << c << std::endl;
 
+    std::chrono::time_point<std::chrono::system_clock> begin, end;
+
+    Matrix *m_list[101];
+    Matrix I = Matrix::identity(20);
+
+    for (int i = 0; i < 101; i++){
+
+        Matrix temp = Matrix::randMint(20, 20, 0, 100).copy();
+        m_list[i] = &temp;
+    }
+
+    begin = std::chrono::system_clock::now();
+
+    for (int i = 0; i < 101; i++){
+        I = I * (*m_list[i]);
+    }
+
+    end = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> duration;
+
+    duration = end - begin;
+
+    std::cout << "C++ time is: " << duration.count() << std::endl;
 
 
     return 0;

@@ -972,11 +972,16 @@ public:
 
         Vector *temp[m];
         for (int i = 0; i < m; i++){
-            *temp[i] = Vector::randVint(n, low, high);
+            Vector *v = new Vector();
+            *v = Vector::randVint(n, low, high);
+            temp[i] = v;
         }
         std::string dimension = std::to_string(m) + "x" + std::to_string(n);
         Matrix result(dimension, temp);
 
+        for (Vector *v : temp){
+            delete v;
+        }
         return result;
     }
 
@@ -986,11 +991,17 @@ public:
         Vector *temp[m];
 
         for (int i = 0; i < m; i++) {
-            *temp[i] = Vector::randVfloat(n, low, high);
+            Vector *v = new Vector();
+            *v = Vector::randVfloat(n, low, high);
+            temp[i] = v;
         }
 
         std::string dimension = std::to_string(m) + "x" + std::to_string(n);
         Matrix result(dimension, temp);
+
+        for (Vector *v : temp) {
+            delete v;
+        }
 
         return result;
     }
@@ -1001,11 +1012,17 @@ public:
         Vector *temp[m];
 
         for (int i = 0; i < m; i++) {
-            *temp[i] = Vector::randVbool(n);
+            Vector *v = new Vector();
+            *v = Vector::randVbool(n);
+            temp[i] = v;
         }
 
         std::string dimension = std::to_string(m) + "x" + std::to_string(n);
         Matrix result(dimension, temp);
+
+        for (Vector *v : temp) {
+            delete v;
+        }
 
         return result;
     }
