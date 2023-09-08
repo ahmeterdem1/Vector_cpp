@@ -114,6 +114,10 @@ completely seperates the returned matrix from the applied object.
 This seperation includes inner vectors. Copied matrices don't get
 affected by change on vectors too.
 
+#### Multiplication
+
+Changing the order always transposes.
+
 #### Important summary
 
 If you pass the vector list from stack, it itself becomes the rows

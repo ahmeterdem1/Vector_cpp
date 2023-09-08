@@ -777,6 +777,37 @@ public:
         return *this;
     }
 
+    Matrix operator* (Matrix M) {
+        // resultant dimension will be this->m X M.n
+        if (this->n != M.m) throw DimensionError();
+
+        std::string dimension = std::to_string(this->m) + "x" + std::to_string(M.n);
+
+        Vector *temp[this->m];
+
+        for (int i = 0; i < this->m; i++) {
+            Vector *t = new Vector(M.n);
+            for (int j = 0; j < M.n; j++){
+                float sum = 0;
+                for (int k = 0; k < this->n; k++){
+                    sum += this->rows[i].values[k] * M.rows[j].values[k];
+                }
+
+                (*t).values[j] = sum;
+            }
+
+            temp[i] = t;
+        }
+
+        Matrix result(dimension, temp);
+
+        for (Vector *v : temp){
+            delete v;
+        }
+
+        return result.transpose();
+    }
+
     bool operator== (Matrix M) {
         if (M.dimension != this->dimension) throw DimensionError();
 
@@ -964,6 +995,47 @@ public:
         return result;
     }
 
+    static Matrix randMbool(int m = 2, int n = 2) {
+        if (m < 0 or n < 0) throw RangeError();
+
+        Vector *temp[m];
+
+        for (int i = 0; i < m; i++) {
+            *temp[i] = Vector::randVbool(n);
+        }
+
+        std::string dimension = std::to_string(m) + "x" + std::to_string(n);
+        Matrix result(dimension, temp);
+
+        return result;
+    }
+
+    static Matrix identity(int m = 2) {
+        // This must be a square matrix.
+
+        std::string dimension = std::to_string(m) + "x" + std::to_string(m);
+        Vector *temp[m];
+
+        for (int i = 0; i < m; i++){
+            Vector *t = new Vector(m);
+            for (int  j = 0; j < m; j++){
+                if (i == j) {
+                    (*t).values[i] = 1;
+                } else {
+                    (*t).values[j] = 0;
+                }
+            }
+
+            temp[i] = t;
+        }
+
+        Matrix result(dimension, temp);
+
+        for (Vector *v: temp){
+            delete v;
+        }
+        return result;
+    }
 
 };
 
