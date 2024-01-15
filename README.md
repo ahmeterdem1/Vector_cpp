@@ -12,3 +12,12 @@ again with python3.9, python3.11 and pypy.
 
 Stay tuned for more.
 
+## Recent updates
+
+Random number generating functions are created from raw _rand()_ function of C++. 
+These are then used to implement random vector generation with static methods.
+
+Type converting functions are also added.
+
+Some more operator overloads are included like ++, --, *=, etc.
+
