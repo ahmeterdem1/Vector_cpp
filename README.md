@@ -21,3 +21,15 @@ Type converting functions are also added.
 
 Some more operator overloads are included like ++, --, *=, etc.
 
+Matrix class included, with almost all of the essential operations. Determinant is
+included in the Vector class, with cross product operation. 
+
+Matrix multiplication is included with the default textbook multiplication algorithm.
+
+Matrices are just Vectors of Vector pointers. Their inner parameters like "size" and
+"length" are hidden in the Vector class. Their "data" is just a pointer to the Vector 
+of Vector pointers. Reaching the data without the [] operator is a little bit tricky
+because of that, but this implementation is indeed very easy to do since the Vector
+class handles all the tedious operations like resizing, etc. 
+
+Resizing will be redone in the near future. Max size update will be 64 places.
