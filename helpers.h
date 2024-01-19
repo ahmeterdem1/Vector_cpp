@@ -12,7 +12,6 @@
 #define undefined NaN(2)
 
 #include "exceptions.h"
-#include "functions.h"
 #include <ostream>
 
 template <typename T>

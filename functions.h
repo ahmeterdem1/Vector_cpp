@@ -6,7 +6,6 @@
 #define VECTOR_CPP_FUNCTIONS_H
 
 #include <functional>
-#include "exceptions.h"
 #include "helpers.h"
 
 float randf() {

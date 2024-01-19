@@ -5,10 +5,7 @@
 #ifndef VECTOR_CPP_VECTOR_H
 #define VECTOR_CPP_VECTOR_H
 
-#include <ostream>
-#include <functional>
 #include <type_traits>
-#include "exceptions.h"
 #include "functions.h"
 
 template <typename T>

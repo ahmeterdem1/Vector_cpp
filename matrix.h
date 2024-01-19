@@ -5,10 +5,8 @@
 #ifndef VECTOR_CPP_MATRIX_H
 #define VECTOR_CPP_MATRIX_H
 
-#include "exceptions.h"
-#include "functions.h"
 #include "vector.h"
-#include <ostream>
+
 
 template <typename T>
 class Matrix {
@@ -758,7 +756,7 @@ public:
         return result;
     }
 
-    Matrix<T> cumsum() {
+    [[nodiscard]] Matrix<T> cumsum() const {
         if (this->a == 0) {
             Matrix<T> result;
             return result;
@@ -781,7 +779,7 @@ public:
         return result;
     }
 
-    T sum() {
+    [[nodiscard]] T sum() const {
         if (this->a == 0) return 0;
         T sum = 0;
         for (int i = 0; i < this->a; i++) {
@@ -791,6 +789,106 @@ public:
             }
         }
         return sum;
+    }
+
+    [[nodiscard]] Matrix<T> getDiagonal() const {
+        if (this->a == 0) {
+            Matrix<T> result;
+            return result;
+        }
+        if (this->a != this->b) throw DimensionError();
+        Vector<T> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            T temp[this->b];
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (i == j) *(temp + j) = *(v->data + j);
+                else *(temp + j) = 0;
+            }
+            *(new_data + i) = Vector<T>(this->b, temp);
+        }
+        Matrix<T> result(this->a, this->b, new_data);
+        return result;
+    }
+
+    [[nodiscard]] Matrix<T> getUpper() const {
+        if (this->a == 0) {
+            Matrix<T> result;
+            return result;
+        }
+        if (this->a != this->b) throw DimensionError();
+        Vector<T> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            T temp[this->b];
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (i < j) *(temp + j) = *(v->data + j);
+                else *(temp + j) = 0;
+            }
+            *(new_data + i) = Vector<T>(this->b, temp);
+        }
+        Matrix<T> result(this->a, this->b, new_data);
+        return result;
+    }
+
+    [[nodiscard]] Matrix<T> getLower() const {
+        if (this->a == 0) {
+            Matrix<T> result;
+            return result;
+        }
+        if (this->a != this->b) throw DimensionError();
+        Vector<T> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            T temp[this->b];
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (i > j) *(temp + j) = *(v->data + j);
+                else *(temp + j) = 0;
+            }
+            *(new_data + i) = Vector<T>(this->b, temp);
+        }
+        Matrix<T> result(this->a, this->b, new_data);
+        return result;
+    }
+
+    T trace() const {
+        if (this->a == 0) return 0;
+        if (this->a != this->b) throw DimensionError();
+        T mul = 1;
+        for (int i = 0; i < this->a; i++) {
+            mul *= *((*(this->data->data + i))->data + i);
+        }
+        return mul;
+    }
+
+    T sumDiagonal() const {
+        if (this->a == 0) return 0;
+        if (this->a != this->b) throw DimensionError();
+        T sum = 0;
+        for (int i = 0; i < this->a; i++) {
+            sum += *((*(this->data->data + i))->data + i);
+        }
+        return sum;
+    }
+
+    [[nodiscard]] int* __pivots() const {
+        if (this->a == 0) return nullptr;
+        auto plist = new int[this->a];
+        for (int i = 0; i < this->a; i++) {
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (*(v->data + j) != 0) {
+                    *(plist + i) = j;
+                    break;
+                }
+            }
+        }
+        return plist;
+    }
+
+    Matrix<double> echelon() {
+        auto plist = this->__pivots();
+
     }
 };
 

@@ -6,7 +6,6 @@
 #define VECTOR_CPP_COMPLEX_H
 
 #include "functions.h"
-#include "exceptions.h"
 #include "helpers.h"
 #include <ostream>
 

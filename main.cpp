@@ -115,10 +115,15 @@ int main() {
     std::cout << Infinity() - Infinity(false) << std::endl;
     std::cout << (Infinity() > Infinity(false)) << std::endl;
 
-    Vector<complex<int>> vc;
-    vc.append(complex<int>(1, 1));
-    vc.append(complex<int>(3, -2));
-    std::cout << vc << std::endl;
-
+    auto test = Matrix<int>::randMint(4, 4, 0, 5);
+    std::cout << test << std::endl << std::endl;
+    std::cout << test.getUpper() << std::endl << std::endl;
+    std::cout << test.getDiagonal() << std::endl << std::endl;
+    std::cout << test.getLower()<< std::endl << std::endl;
+    std::cout << test.trace() << std::endl;
+    auto plist = test.__pivots();
+    for (int i = 0; i < 4; i++) {
+        std::cout << *(plist + i) << std::endl;
+    }
     return 0;
 }
