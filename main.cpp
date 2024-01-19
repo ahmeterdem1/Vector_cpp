@@ -53,6 +53,7 @@ int main() {
     m.append(q);
     std::cout << m << std::endl;
     std::cout << std::endl;
+    std::cout << m.determinant() << std::endl;
     m.pop();
     std::cout << m << std::endl;
     std::cout << std::endl;
@@ -110,20 +111,14 @@ int main() {
     auto new_list = Vector<double>::spanify(3, dlist);
     std::cout << Vector<double>::doesSpan(3, new_list) << std::endl;
 
-    std::cout << "----------" << std::endl;
-    std::cout << NaN(0) << std::endl;
-    std::cout << Infinity() - Infinity(false) << std::endl;
-    std::cout << (Infinity() > Infinity(false)) << std::endl;
-
-    auto test = Matrix<int>::randMint(4, 4, 0, 5);
-    std::cout << test << std::endl << std::endl;
-    std::cout << test.getUpper() << std::endl << std::endl;
-    std::cout << test.getDiagonal() << std::endl << std::endl;
-    std::cout << test.getLower()<< std::endl << std::endl;
-    std::cout << test.trace() << std::endl;
-    auto plist = test.__pivots();
-    for (int i = 0; i < 4; i++) {
-        std::cout << *(plist + i) << std::endl;
-    }
+    std::chrono::time_point<std::chrono::steady_clock> begin, end;
+    auto M = Matrix<int>::randMint(500, 500, -5, 5);
+    std::cout << "Generation done" << std::endl;
+    begin = std::chrono::steady_clock::now();
+    auto det = M.determinant();
+    end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> dur{end - begin};
+    std::cout << "Time of determinant: " << dur.count() << std::endl;
+    std::cout << det << std::endl;
     return 0;
 }

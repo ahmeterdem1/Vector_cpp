@@ -73,6 +73,29 @@ public:
         return result;
     }
 
+    void insert(int index, const Vector<T>& v) {
+        if (v.length != this->b and this->b != 0) throw DimensionError();
+        if (this->b == 0) {
+            this->b = v.length;
+        }
+        auto to_add = new Vector<T>(v.length, v.data);
+        if (this->data == nullptr) {
+            this->data = new Vector<Vector<T>*>[2];
+            this->data->data = to_add;
+            this->a = 1;
+            return;
+        }
+        if (index < 0) index += this->a;
+        if (index < 0) {
+            to_add.clear();
+            delete to_add;
+            throw IndexError();
+        }
+        // Without error checking here, if the error occurs in the Vector->insert,
+        // Then we have a memory leak
+        this->data->insert(index, to_add);
+    }
+
     void resize() {
         this->data->resize();
     }
@@ -613,7 +636,7 @@ public:
                 *(temp + j) = static_cast<int>(*(v->data + j));
             }
             Vector<int> v_temp(this->b, temp);
-            *(temp + i) = v_temp;
+            *(new_data + i) = v_temp;
         }
         Matrix<int> result(this->a, this->b, new_data);
         return result;
@@ -628,7 +651,7 @@ public:
                 *(temp + j) = static_cast<float>(*(v->data + j));
             }
             Vector<float> v_temp(this->b, temp);
-            *(temp + i) = v_temp;
+            *(new_data + i) = v_temp;
         }
         Matrix<float> result(this->a, this->b, new_data);
         return result;
@@ -643,7 +666,7 @@ public:
                 *(temp + j) = static_cast<double>(*(v->data + j));
             }
             Vector<double> v_temp(this->b, temp);
-            *(temp + i) = v_temp;
+            *(new_data + i) = v_temp;
         }
         Matrix<double> result(this->a, this->b, new_data);
         return result;
@@ -658,7 +681,7 @@ public:
                 *(temp + j) = static_cast<bool>(*(v->data + j));
             }
             Vector<bool> v_temp(this->b, temp);
-            *(temp + i) = v_temp;
+            *(new_data + i) = v_temp;
         }
         Matrix<bool> result(this->a, this->b, new_data);
         return result;
@@ -880,15 +903,80 @@ public:
                 if (*(v->data + j) != 0) {
                     *(plist + i) = j;
                     break;
+                } else if (j == this->b - 1) {
+                    *(plist + i) = this->b;
                 }
             }
         }
         return plist;
     }
 
-    Matrix<double> echelon() {
-        auto plist = this->__pivots();
+    Matrix<double> echelon(const double& lowlimit = 0.0000000001, const double& highlimit = 1000000) {
+        Vector<double>* temp;
+        Vector<double>* v;
+        Vector<double>* w;
+        double first, rows_first;
+        int first_index;
+        double factor;
 
+        auto copy_matrix = this->toDouble();
+
+        // Bubble sort
+        for (int i = 0; i < this->a; i++) {
+            for (int j = 0; j < this->a - i - 1; j++) {
+                if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
+                    *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                    *(copy_matrix.data->data + j + 1) = temp;
+                }
+            }
+        }
+
+        for (int i = 0; i < this->a; i++) {
+            v = *(copy_matrix.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (*(v->data + j) != 0) {
+                    first = *(v->data + j);
+                    first_index = j;
+                    break;
+                }
+            }
+            for (int r = i + 1; r < this->a; r++) {
+                w = *(copy_matrix.data->data + r); // pointer to vector
+                rows_first = *(w->data + first_index);
+                if (abs(rows_first - 0) < lowlimit) continue;
+                factor = rows_first / first;
+                if (factor > highlimit) continue;
+                *w -= factor * *v;
+            }
+        }
+
+        for (int i = 0; i < this->a; i++) {
+            for (int j = 0; j < this->a - i - 1; j++) {
+                if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
+                    *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                    *(copy_matrix.data->data + j + 1) = temp;
+                }
+            }
+        }
+        return copy_matrix;
+    }
+
+    double determinant(const std::string& method = "echelon") {
+        if (this->a != this->b) throw DimensionError();
+        if (this->a == 1) {
+            return *((*(this->data->data))->data);
+        }
+        if (method == "analytic") {
+            Vector<T> v_list[this->a];
+            for (int i = 0; i < this->a; i++) {
+                *(v_list + i) = **(this->data->data + i);
+            }
+            return Vector<T>::determinant(this->a, v_list);
+        } else if (method == "echelon") {
+            return this->echelon().trace();
+        }
     }
 };
 

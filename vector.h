@@ -29,7 +29,7 @@ public:
                 power *= 2;
             }
         } else {
-            power = floor(data_size / 64) + 64;
+            power = 64 * floor(data_size / 64) + 64;
         }
 
         T *inn= new T[power];
@@ -57,7 +57,7 @@ public:
                 start *= 2;
             }
         } else {
-            start = floor(this->length / 64) + 64;
+            start = 64 * floor(this->length / 64) + 64;
         }
         if (start == this->size) return;
         auto* temp = this->data;
@@ -103,6 +103,7 @@ public:
         }
 
         if (this->size < 64) {
+            // Resizing is exponential
             T *new_data = new T[2 * this->size];
             auto *temp = this->data;
             std::move(temp, temp + this->size, new_data);
@@ -112,6 +113,7 @@ public:
             this->size *= 2;
             this->length += 1;
         } else {
+            // Resizing is linear, 64 places per increase
             T *new_data = new T[this->size + 64];
             auto *temp = this->data;
             std::move(temp, temp + this->size, new_data);
@@ -137,6 +139,51 @@ public:
         return r_value;
     }
 
+    void insert(int index, T val) {
+        if (this->length == 0) {
+            T* new_data = new T[2];
+            *new_data = val;
+            this->size = 2;
+            this->length = 1;
+            this->data = new_data;
+            return;
+        }
+        if (index < 0) index += this->length;
+        if (index < 0) throw IndexError();
+        if (this->size - this->length > 0) {
+            auto temp = *(this->data + index);
+            *(this->data + index) = val;
+            T temp2;
+            for (int i = index + 1; i < this->length; i++) {
+                temp2 = *(this->data + i);
+                *(this->data + i) = temp;
+                temp = temp2;
+            }
+            *(this->data + this->length) = temp;
+        } else if (this->size < 64) {
+            T *new_data = new T[2 * this->size];
+            auto *temp = this->data;
+            std::move(temp, temp + index, new_data);
+            *(new_data + index) = val;
+            for (int i = index + 1; i < this->length; i++) {
+                *(new_data + i) = *(temp + i - 1);
+            }
+            this->size *= 2;
+            this->data = new_data;
+        } else {
+            T *new_data = new T[this->size + 64];
+            auto *temp = this->data;
+            std::move(temp, temp + index, new_data);
+            *(new_data + index) = val;
+            for (int i = index + 1; i < this->length; i++) {
+                *(new_data + i) = *(temp + i - 1);
+            }
+            this->size += 64;
+            this->data = new_data;
+        }
+        this->length += 1;
+    }
+
     Vector<T> clear() {
         if (this->data != nullptr) {
             delete[] this->data;
@@ -144,6 +191,14 @@ public:
             this->length = 0;
         }
         return *this;
+    }
+
+    int __pivot(const double& limiter = 0.0000000000000000001) {
+        if (this->length == 0) return 0;
+        for (int i = 0; i < this->length; i++) {
+            if (abs(*(this->data + i) - 0) < limiter) return i;
+        }
+        return this->length;
     }
 
     Vector<T> operator+ (const T& a) const {
@@ -745,7 +800,7 @@ public:
     static double determinant(const int& amount, const Vector<T>* v_list) {
         if (amount == 0) throw RangeError();
         for (int i = 0; i < amount; i++) if (amount != (v_list + i)->length) throw DimensionError();
-        if (amount == 1) return 1 / *(v_list->data);
+        if (amount == 1) return *(v_list->data);
         if (amount == 2) {
             return (*(v_list->data) * *((v_list + 1)->data + 1)) - (*(v_list->data + 1) * *((v_list + 1)->data));
         }
