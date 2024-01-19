@@ -73,12 +73,26 @@ int main() {
     std::cout << n * m << std::endl;
     std::cout << 0.5 * m << std::endl;
     std::cout << Matrix<float>::randMfloat(3, 3, -2, 2) << std::endl;
+
+    /*
     std::chrono::time_point<std::chrono::steady_clock> begin, end;
     begin = std::chrono::steady_clock::now();
     Matrix<double>::randMdouble(1000, 1000, -10, 10) * Matrix<double>::randMdouble(1000, 1000, -10, 10);
     end = std::chrono::steady_clock::now();
     std::chrono::duration<double> dur{end - begin};
     std::cout << "Time of multiplication 1000x1000: " << dur.count() << std::endl;
-
+    */
+    std::cout << v << std::endl;
+    std::cout << Matrix<int>::identity(3) * v << std::endl;
+    std::cout << v.cumsum() << std::endl;
+    std::cout << (v == v) << std::endl;
+    std::cout << (v >= w.toFloat()) << std::endl;
+    std::cout << m.cumsum() << std::endl;
+    std::cout << m.sum() << std::endl;
+    std::cout << v.sum() << std::endl;
+    auto c = complex<int>(1, -2);
+    std::cout << c / 2.2 << std::endl;
+    std::cout << sqrt(5.5, 15) << std::endl;
+    //std::cout << Infinity() + Infinity(false) << std::endl;
     return 0;
 }

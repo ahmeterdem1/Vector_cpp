@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <type_traits>
+#include <variant>
 
 class IndexError : public std::exception {
 public:
@@ -107,6 +108,349 @@ bool randbool() {
     if (rand() % 2) return true;
     return false;
 }
+
+template <typename T>
+double sqrt(const T& val, const unsigned int& resolution = 15) {
+    if (resolution == 0) throw RangeError();
+    double temp = 2;
+    for (int i = 0; i < resolution; i++) {
+        temp = 0.5 * (temp + val/temp);
+    }
+    return temp;
+}
+
+class NaN {
+public:
+    virtual ~NaN() = default;
+    NaN() = default;
+
+    virtual void print(std::ostream& o) const {
+        o << "NaN";
+    };
+
+    friend std::ostream& operator<< (std::ostream& o, const NaN& n) {
+        n.print(o);
+        return o;
+    }
+
+};
+
+class Undefined : public NaN {
+public:
+    Undefined() = default;
+
+    void print(std::ostream& o) const override {
+        o << "Undefined";
+    }
+
+    friend std::ostream& operator<< (std::ostream& o, const Undefined& u) {
+        u.print(o);
+        return o;
+    }
+
+    Undefined operator++ () const { // Yes, it is a const function here...
+        return Undefined();
+    }
+
+    Undefined operator-- () const {
+        return Undefined();
+    }
+
+    Undefined operator+ (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator+ (const T& anything) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    friend Undefined operator+ (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator- (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator- (const T& anything) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    friend Undefined operator- (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator* (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator* (const T& anything) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    friend Undefined operator* (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator/ (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator/ (const T& anything) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    friend Undefined operator/ (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator== (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator== (const T& anything) const {
+        return Undefined();
+    }
+    template <typename T>
+    friend Undefined operator== (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator< (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator< (const T& anything) const {
+        return Undefined();
+    }
+    template <typename T>
+    friend Undefined operator< (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator<= (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator<= (const T& anything) const {
+        return Undefined();
+    }
+    template <typename T>
+    friend Undefined operator<= (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator> (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator> (const T& anything) const {
+        return Undefined();
+    }
+    template <typename T>
+    friend Undefined operator> (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+    Undefined operator>= (const Undefined& u) const {
+        return Undefined();
+    }
+
+    template <typename T>
+    Undefined operator>= (const T& anything) const {
+        return Undefined();
+    }
+    template <typename T>
+    friend Undefined operator>= (const T& anything, const Undefined& u) {
+        return Undefined();
+    }
+
+};
+
+class Infinity : public NaN {
+public:
+    bool sign = true;
+
+    Infinity() = default;
+
+    template <typename T>
+    explicit Infinity(const T& given) {
+        this->sign = bool(given);
+    }
+
+    void print(std::ostream& o) const override {
+        if (this->sign) {
+            o << "Infinity(+)";
+        } else {
+            o << "Infinity(-)";
+        }
+    }
+
+};
+
+template <typename T>
+class complex {
+    template <typename U>
+    using ctype = typename std::common_type<T, U>::type;
+
+public:
+    T real = 0;
+    T imaginary = 0;
+
+    complex() = default;
+
+    explicit complex(const T& real) {
+        this->real = real;
+    }
+
+    explicit complex(const T& real, const T& imag) {
+        this->real = real;
+        this->imaginary = imag;
+    }
+
+    friend std::ostream& operator<< (std::ostream& o, const complex& c) {
+        if (c.imaginary >= 0) {
+            o << c.real << " + " << c.imaginary << "i";
+            return o;
+        }
+        o << c.real << " - " << -c.imaginary << "i";
+        return o;
+    }
+
+    complex<T> operator+ (const T& val) const {
+        return complex<T>(this->real + val, this->imaginary);
+    }
+
+    friend complex<T> operator+ (const T& val, const complex<T>& c) {
+        return complex<T>(c.real + val, c.imaginary);
+    }
+
+    template <typename U>
+    complex<ctype<U>> operator+ (const U& val) const {
+        return complex<ctype<U>>(static_cast<ctype<U>>(this->real)
+        + static_cast<ctype<U>>(val), static_cast<ctype<U>>(this->imaginary));
+    }
+
+    template <typename U>
+    friend complex<ctype<U>> operator+ (const U& val,const complex<T>& c){
+        return complex<ctype<U>>(static_cast<ctype<U>>(c.real)
+                                 + static_cast<ctype<U>>(val), static_cast<ctype<U>>(c.imaginary));
+    }
+
+    complex<T> operator+ (const complex<T>& c) const {
+        return complex<T>(this->real + c.real, this->imaginary + c.imaginary);
+    }
+
+    friend complex<T> operator+ (const complex<T>& c, const complex<T>& d) {
+        return complex<T>(d.real + c.real, d.imaginary + c.imaginary);
+    }
+
+    template <typename U>
+    complex<ctype<U>> operator+ (const complex<U>& c) const {
+        return complex<ctype<U>>(static_cast<ctype<U>>(this->real) + static_cast<ctype<U>>(c.real),
+                static_cast<ctype<U>>(this->imaginary) + static_cast<ctype<U>>(c.imaginary));
+    }
+
+    complex<T> operator- (const T& val) const {
+        return complex<T>(this->real - val, this->imaginary);
+    }
+
+    friend complex<T> operator- (const T& val, const complex<T>& c) {
+        return complex<T>(val - c.real, -c.imaginary);
+    }
+
+    template <typename U>
+    complex<ctype<U>> operator- (const U& val) const {
+        return complex<ctype<U>>(static_cast<ctype<U>>(this->real) - static_cast<ctype<U>>(val),
+                static_cast<ctype<U>>(this->imaginary));
+    }
+
+    template <typename U>
+    friend complex<ctype<U>> operator- (const U& val, const complex<T>& c) {
+        return complex<ctype<U>>(static_cast<ctype<U>>(val) - static_cast<ctype<U>>(c.real),
+                -static_cast<ctype<U>>(c.imaginary));
+    }
+
+    complex<T> operator- (const complex<T>& c) const {
+        return complex<T>(this->real - c.real, this->imaginary - c.imaginary);
+    }
+
+    template <typename U>
+    complex<ctype<U>> operator- (const complex<U>& c) const {
+        return complex<ctype<U>>(static_cast<ctype<U>>(this->real) - static_cast<ctype<U>>(c.real),
+                static_cast<ctype<U>>(this->imaginary) - static_cast<ctype<U>>(c.imaginary));
+    }
+
+    complex<T> operator* (const T& val) const {
+        return complex<T>(this->real * val, this->imaginary * val);
+    }
+
+    friend complex<T> operator* (const T& val, const complex<T>& c) {
+        return complex<T>(val * c.real, val * c.imaginary);
+    }
+
+    template <typename U>
+    complex<ctype<U>> operator* (const U& val) const {
+        return complex<ctype<U>>(static_cast<ctype<U>>(this->real) * static_cast<ctype<U>>(val),
+                static_cast<ctype<U>>(this->imaginary) * static_cast<ctype<U>>(val));
+    }
+
+    template <typename U>
+    friend complex<ctype<U>> operator* (const U& val, const complex<T>& c) {
+        return complex<ctype<U>>(static_cast<ctype<U>>(val) * static_cast<ctype<U>>(c.real),
+                 static_cast<ctype<U>>(val) * static_cast<ctype<U>>(c.imaginary));
+    }
+
+    complex<T> operator* (const complex<T>& c) const {
+        return complex<T>((this->real * c.real - this->imaginary * c.imaginary), 2 * this->imaginary * c.imaginary);
+    }
+
+    template <typename U>
+    complex<ctype<U>> operator* (const complex<U>& c) const {
+        return complex<ctype<U>>((static_cast<ctype<U>>(this->real) * static_cast<ctype<U>>(c.real) -
+        static_cast<ctype<U>>(this->imaginary) * static_cast<ctype<U>>(c.imaginary)),
+                2 * static_cast<ctype<U>>(this->imaginary) * static_cast<ctype<U>>(c.imaginary));
+    }
+
+    template <typename U>
+    complex<double> operator/ (const U& val) const {
+        return complex<double>(this->real / val, this->imaginary / val);
+    }
+
+    template <typename U>
+    friend complex<double> operator/ (const U& val, const complex<T>& c) {
+        auto temp = c.real * c.real - c.imaginary * c.imaginary;
+        return complex<double>(val * c.real / temp, - c.imaginary * val / temp);
+    }
+
+    template <typename U>
+    complex<double> operator/ (const complex<U>& c) const {
+        auto val = this->real * c.real - this->imaginary * c.imaginary;
+        return complex<double>((this->real * c.real + this->imaginary * c.imaginary) / val,
+                               (c.real * this->imaginary - this->real * c.imaginary) / val);
+    }
+
+    [[nodiscard]] complex<T> conjugate() const {
+        return complex<T>(this->real, -this->imaginary);
+    }
+
+    complex<double> inverse() {
+        auto val = this->real * this->real - this->imaginary * this->imaginary;
+        return complex<double>(this->real / val, -this->imaginary / val);
+    }
+};
 
 template <typename T>
 class Vector {
@@ -503,6 +847,116 @@ public:
         return *this;
     }
 
+    bool operator== (const Vector<T>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        for (int i = 0; i < this->length; i++) {
+            if (*(this->data + i) != *(v.data + i)) return false;
+        }
+        return true;
+    }
+
+    template <typename U>
+    bool operator== (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        for (int i = 0; i < this->length; i++) {
+            if (*(this->data + i) != *(v.data + i)) return false;
+        }
+        return true;
+    }
+
+    bool operator!= (const Vector<T>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        for (int i = 0; i < this->length; i++) {
+            if (*(this->data + i) == *(v.data + i)) return false;
+        }
+        return true;
+    }
+
+    template <typename U>
+    bool operator!= (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        for (int i = 0; i < this->length; i++) {
+            if (*(this->data + i) == *(v.data + i)) return false;
+        }
+        return true;
+    }
+
+    bool operator> (const Vector<T>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 > 0;
+    }
+
+    template <typename U>
+    bool operator> (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 > 0;
+    }
+
+    bool operator>= (const Vector<T>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 >= 0;
+    }
+
+    template <typename U>
+    bool operator>= (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 >= 0;
+    }
+
+    bool operator< (const Vector<T>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 < 0;
+    }
+
+    template <typename U>
+    bool operator< (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 < 0;
+    }
+
+    bool operator<= (const Vector<T>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 <= 0;
+    }
+
+    template <typename U>
+    bool operator<= (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        double sum1 = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum1 += pow(*(this->data + i), 2) - pow(*(v.data + i), 2);
+        }
+        return sum1 <= 0;
+    }
+
     T dot (const Vector<T>& v) const {
         if (this->length != v.length) throw DimensionError();
         T sum = 0;
@@ -715,6 +1169,30 @@ public:
         delete[] this->data;
         this->data = temp;
     }
+
+    Vector<T> cumsum() {
+        if (this->length == 0) {
+            Vector<T> result;
+            return result;
+        }
+
+        T temp[this->length];
+        *temp = *this->data;
+        for (int i = 1; i < this->length; i++) {
+            *(temp + i) = *(temp + i - 1) + *(this->data + i);
+        }
+        Vector<T> result(this->length, temp);
+        return result;
+    }
+
+    T sum() {
+        if (this->length == 0) return 0;
+        T sum = 0;
+        for (int i = 0; i < this->length; i++) {
+            sum += *(this->data + i);
+        }
+        return sum;
+    }
 };
 
 template <typename T>
@@ -741,7 +1219,6 @@ public:
         this->a = a;
         this->b = b;
     }
-
 
     friend std::ostream& operator<< (std::ostream& o, const Matrix<T>& m) {
         if (m.a == 0) {
@@ -791,6 +1268,10 @@ public:
         this->data->reverse();
     }
 
+    unsigned int getsize() {
+        return this->data->getsize();
+    }
+
     Vector<T> operator[] (int index) const {
         if (this->a == 0) throw IndexError();
         if (index < 0) index += this->a;
@@ -798,12 +1279,13 @@ public:
         return **(this->data->data + index);
     }
 
-    Matrix<T> transpose() const {
+    [[nodiscard]] Matrix<T> transpose() const {
         Vector<T> new_data[this->b];
         for (int i = 0; i < this->b; i++) {
             T temp[this->a];
+            auto v = *(this->data->data);
             for (int j = 0; j < this->a; j++) {
-                temp[j] = *((*(this->data->data + j))->data + i);
+                temp[j] = *((v->data + j) + i);
             }
             Vector<T> v_temp(this->a, temp);
             *(new_data + i) = v_temp;
@@ -816,8 +1298,9 @@ public:
         Vector<T> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = *((*(this->data->data + i))->data + j) + val;
+                temp[j] = *(v->data + j) + val;
             }
             Vector<T> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -830,8 +1313,9 @@ public:
         Vector<T> new_data[m.a];
         for (int i = 0; i < m.a; i++) {
             T temp[m.b];
+            auto v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
-                temp[j] = *((*(m.data->data + i))->data + j) + val;
+                temp[j] = *(v->data + j) + val;
             }
             Vector<T> v_temp(m.b, temp);
             *(new_data + i) = v_temp;
@@ -846,8 +1330,9 @@ public:
         auto c = static_cast<ctype<U>>(val);
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = static_cast<ctype<U>>(*((*(this->data->data + i))->data + j)) + c;
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) + c;
             }
             Vector<ctype<U>> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -862,8 +1347,9 @@ public:
         auto c = static_cast<ctype<U>>(val);
         for (int i = 0; i < m.a; i++) {
             ctype<U> temp[m.b];
+            auto v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
-                temp[j] = static_cast<ctype<U>>(*((*(m.data->data + i))->data + j)) + c;
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) + c;
             }
             Vector<ctype<U>> v_temp(m.b, temp);
             *(new_data + i) = v_temp;
@@ -877,8 +1363,10 @@ public:
         Vector<T> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = *((*(this->data->data + i))->data + j) + *((*(m.data->data + i))->data + j);
+                temp[j] = *(v->data + j) + *(w->data + j);
             }
             Vector<T> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -893,8 +1381,10 @@ public:
         Vector<ctype<U>> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = static_cast<ctype<U>>(*((*(this->data->data + i))->data + j)) + static_cast<ctype<U>>(*((*(m.data->data + i))->data + j));
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) + static_cast<ctype<U>>(*(w->data + j));
             }
             Vector<ctype<U>> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -907,8 +1397,9 @@ public:
         Vector<T> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = *((*(this->data->data + i))->data + j) - val;
+                temp[j] = *(v->data + j) - val;
             }
             Vector<T> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -921,8 +1412,9 @@ public:
         Vector<T> new_data[m.a];
         for (int i = 0; i < m.a; i++) {
             T temp[m.b];
+            auto v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
-                temp[j] = val - *((*(m.data->data + i))->data + j);
+                temp[j] = val - *(v->data + j);
             }
             Vector<T> v_temp(m.b, temp);
             *(new_data + i) = v_temp;
@@ -937,8 +1429,9 @@ public:
         auto c = static_cast<ctype<U>>(val);
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = static_cast<ctype<U>>(*((*(this->data->data + i))->data + j)) - c;
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) - c;
             }
             Vector<ctype<U>> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -953,8 +1446,9 @@ public:
         auto c = static_cast<ctype<U>>(val);
         for (int i = 0; i < m.a; i++) {
             ctype<U> temp[m.b];
+            auto v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
-                temp[j] = c - static_cast<ctype<U>>(*((*(m.data->data + i))->data + j));
+                temp[j] = c - static_cast<ctype<U>>(*(*v->data + j));
             }
             Vector<ctype<U>> v_temp(m.b, temp);
             *(new_data + i) = v_temp;
@@ -968,8 +1462,10 @@ public:
         Vector<T> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = *((*(this->data->data + i))->data + j) - *((*(m.data->data + i))->data + j);
+                temp[j] = *(v->data + j) - *(w->data + j);
             }
             Vector<T> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -984,8 +1480,10 @@ public:
         Vector<ctype<U>> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = static_cast<ctype<U>>(*((*(this->data->data + i))->data + j)) - static_cast<ctype<U>>(*((*(m.data->data + i))->data + j));
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) - static_cast<ctype<U>>(*(w->data + j));
             }
             Vector<ctype<U>> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -998,8 +1496,9 @@ public:
         Vector<T> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = *((*(this->data->data + i))->data + j) * val;
+                temp[j] = *(v->data + j) * val;
             }
             Vector<T> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -1012,8 +1511,9 @@ public:
         Vector<T> new_data[m.a];
         for (int i = 0; i < m.a; i++) {
             T temp[m.b];
+            auto v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
-                temp[j] = val * *((*(m.data->data + i))->data + j);
+                temp[j] = val * *(v->data + j);
             }
             Vector<T> v_temp(m.b, temp);
             *(new_data + i) = v_temp;
@@ -1028,9 +1528,9 @@ public:
         auto c = static_cast<ctype<U>>(val);
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
-            auto v = **(this->data->data + i);
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                temp[j] = static_cast<ctype<U>>(*(v.data + j)) * c;
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) * c;
             }
             Vector<ctype<U>> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -1045,9 +1545,9 @@ public:
         auto c = static_cast<ctype<U>>(val);
         for (int i = 0; i < m.a; i++) {
             ctype<U> temp[m.b];
-            auto v = **(m.data->data + i);
+            auto v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
-                *(temp + j) = c * static_cast<ctype<U>>(*(v.data + j));
+                *(temp + j) = c * static_cast<ctype<U>>(*(v->data + j));
             }
             Vector<ctype<U>> v_temp(m.b, temp);
             *(new_data + i) = v_temp;
@@ -1061,12 +1561,12 @@ public:
         Vector<T> new_data[this->a]; // m.b is the length of each vector
 
         for (int i = 0; i < this->a; i++) {
-            auto v = **(this->data->data + i); // basis vector copied, faster for higher dimensional operations
+            auto v = *(this->data->data + i); // pointer to basis vector copied, ~%2.5 faster for high dimensional matrices.
             T temp[m.b];
             for (int j = 0; j < m.b; j++) {
                 T sum = 0;
                 for (int k = 0; k < m.a; k++) {
-                    sum += *(v.data + k) * *((*(m.data->data + k))->data + j);
+                    sum += *(v->data + k) * *((*(m.data->data + k))->data + j);
                 }
                 *(temp + j) = sum;
             }
@@ -1083,12 +1583,12 @@ public:
         Vector<ctype<U>> new_data[this->a]; // m.b is the length of each vector
 
         for (int i = 0; i < this->a; i++) {
-            auto v = **(this->data->data + i); // basis vector copied
+            auto v = *(this->data->data + i); // basis vector copied
             ctype<U> temp[m.b];
             for (int j = 0; j < m.b; j++) {
                 ctype<U> sum = 0;
                 for (int k = 0; k < m.a; k++) {
-                    sum += static_cast<ctype<U>>(*(v.data + k)) * static_cast<ctype<U>>(*((*(m.data->data + k))->data + j));
+                    sum += static_cast<ctype<U>>(*(v->data + k)) * static_cast<ctype<U>>(*((*(m.data->data + k))->data + j));
                 }
                 *(temp + j) = sum;
             }
@@ -1099,14 +1599,46 @@ public:
         return result;
     }
 
+    Vector<T> operator* (const Vector<T>& v) const {
+        if (this->b != v.length) throw DimensionError();
+        T temp[this->a];
+        auto v_data = v.data;
+        for (int i = 0; i < this->a; i++) {
+            auto w = *(this->data->data + i);
+            T sum = 0;
+            for (int j = 0; j < this->b; j++) {
+                sum += *(w->data + j) * *(v_data + j);
+            }
+            *(temp + i) = sum;
+        }
+        Vector<T> result(this->b, temp);
+        return result;
+    }
+
+    template <typename U>
+    Vector<ctype<U>> operator* (const Vector<U>& v) const {
+        if (this->b != v.length) throw DimensionError();
+        ctype<U> temp[this->a];
+        for (int i = 0; i < this->a; i++) {
+            auto w = *(this->data->data + i);
+            ctype<U> sum = 0;
+            for (int j = 0; j < this->b; j++) {
+                sum += *(w->data + j) * *(v.data + j);
+            }
+            *(temp + i) = sum;
+        }
+        Vector<ctype<U>> result(this->b, temp);
+        return result;
+    }
+
     template <typename U>
     Matrix<double> operator/ (const U& val) const {
         Vector<double> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             double temp[this->b];
-            auto v = **(this->data->data + i);
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                *(temp + j) = static_cast<double>(*(v.data + j)) / val;
+                *(temp + j) = static_cast<double>(*(v->data + j)) / val;
             }
             Vector<double> v_temp(this->b, temp);
             *(new_data + i) = v_temp;
@@ -1115,13 +1647,63 @@ public:
         return result;
     }
 
+    bool operator== (const Matrix<T>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        for (int i = 0; i < this->a; i++) {
+            auto a = *(this->data->data + i);
+            auto b = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (*(a->data + j) != *(b->data + j)) return false;
+            }
+        }
+        return true;
+    }
+
+    template <typename U>
+    bool operator== (const Matrix<U>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        for (int i = 0; i < this->a; i++) {
+            auto a = *(this->data->data + i);
+            auto b = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (*(a->data + j) != *(b->data + j)) return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator!= (const Matrix<T>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        for (int i = 0; i < this->a; i++) {
+            auto a = *(this->data->data + i);
+            auto b = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (*(a->data + j) == *(b->data + j)) return false;
+            }
+        }
+        return true;
+    }
+
+    template <typename U>
+    bool operator!= (const Matrix<U>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        for (int i = 0; i < this->a; i++) {
+            auto a = *(this->data->data + i);
+            auto b = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (*(a->data + j) == *(b->data + j)) return false;
+            }
+        }
+        return true;
+    }
+
     Matrix<int> toInt() const {
         Vector<int> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             int temp[this->b];
-            auto v = **(this->data->data + i);
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                *(temp + j) = static_cast<int>(*(v.data + j));
+                *(temp + j) = static_cast<int>(*(v->data + j));
             }
             Vector<int> v_temp(this->b, temp);
             *(temp + i) = v_temp;
@@ -1134,9 +1716,9 @@ public:
         Vector<float> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             float temp[this->b];
-            auto v = **(this->data->data + i);
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                *(temp + j) = static_cast<float>(*(v.data + j));
+                *(temp + j) = static_cast<float>(*(v->data + j));
             }
             Vector<float> v_temp(this->b, temp);
             *(temp + i) = v_temp;
@@ -1149,9 +1731,9 @@ public:
         Vector<double> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             double temp[this->b];
-            auto v = **(this->data->data + i);
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                *(temp + j) = static_cast<double>(*(v.data + j));
+                *(temp + j) = static_cast<double>(*(v->data + j));
             }
             Vector<double> v_temp(this->b, temp);
             *(temp + i) = v_temp;
@@ -1164,9 +1746,9 @@ public:
         Vector<bool> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             bool temp[this->b];
-            auto v = **(this->data->data + i);
+            auto v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
-                *(temp + j) = static_cast<bool>(*(v.data + j));
+                *(temp + j) = static_cast<bool>(*(v->data + j));
             }
             Vector<bool> v_temp(this->b, temp);
             *(temp + i) = v_temp;
@@ -1207,7 +1789,7 @@ public:
             T temp[d];
             for (int j = 0; j < d; j++) {
                 if (i == j) *(temp + j) = 1;
-                else *(temp + j) = 1;
+                else *(temp + j) = 0;
             }
             *(new_data + i) = Vector<T>(d, temp);
         }
@@ -1265,6 +1847,41 @@ public:
         }
         Matrix<bool> result(m, n, new_data);
         return result;
+    }
+
+    Matrix<T> cumsum() {
+        if (this->a == 0) {
+            Matrix<T> result;
+            return result;
+        }
+
+        Vector<T> list[this->a];
+        T remainder = 0;
+        for (int i = 0; i < this->a; i++) {
+            auto v = *(this->data->data + i);
+            T temp[this->b];
+            *temp = *(v->data) + remainder;
+            for (int j = 1; j < this->b; j++) {
+                *(temp + j) = *(temp + j - 1) + *(v->data + j);
+            }
+            Vector<T> temp_v(this->b, temp);
+            *(list + i) = temp_v;
+            remainder = *(temp + this->b - 1);
+        }
+        Matrix<T> result(this->a, this->b, list);
+        return result;
+    }
+
+    T sum() {
+        if (this->a == 0) return 0;
+        T sum = 0;
+        for (int i = 0; i < this->a; i++) {
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                sum += *(v->data + j);
+            }
+        }
+        return sum;
     }
 };
 

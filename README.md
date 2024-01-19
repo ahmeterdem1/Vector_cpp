@@ -33,3 +33,12 @@ because of that, but this implementation is indeed very easy to do since the Vec
 class handles all the tedious operations like resizing, etc. 
 
 Resizing will be redone in the near future. Max size update will be 64 places.
+
+complex class is being included. Function definitions of the complex class are designed
+to use minimal RAM instead of the fastest option. Since there are 2 number in each complex
+number, speed won't make a big difference.
+
+My pathetic trial of Infinity and Undefined is also included.
+
+Vector and Matrix classes are further expanded to include more methods, primarily 
+comparison overloads.
