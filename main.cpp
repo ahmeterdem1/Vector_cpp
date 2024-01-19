@@ -93,6 +93,32 @@ int main() {
     auto c = complex<int>(1, -2);
     std::cout << c / 2.2 << std::endl;
     std::cout << sqrt(5.5, 15) << std::endl;
-    //std::cout << Infinity() + Infinity(false) << std::endl;
+
+    // cursed loop
+    for (float k in Range<float>(3, 5, 0.1)) {
+        std::cout << k << std::endl;
+    }
+
+    std::cout << e(2) << std::endl;
+    std::cout << sin(30, 10) << std::endl;
+    std::cout << cos(30, 10) << std::endl;
+
+    Vector<double> dlist[3];
+    dlist[0] = v.toDouble();
+    dlist[1] = w.toDouble();
+    dlist[2] = q.toDouble();
+    auto new_list = Vector<double>::spanify(3, dlist);
+    std::cout << Vector<double>::doesSpan(3, new_list) << std::endl;
+
+    std::cout << "----------" << std::endl;
+    std::cout << NaN(0) << std::endl;
+    std::cout << Infinity() - Infinity(false) << std::endl;
+    std::cout << (Infinity() > Infinity(false)) << std::endl;
+
+    Vector<complex<int>> vc;
+    vc.append(complex<int>(1, 1));
+    vc.append(complex<int>(3, -2));
+    std::cout << vc << std::endl;
+
     return 0;
 }

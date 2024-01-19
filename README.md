@@ -32,13 +32,17 @@ of Vector pointers. Reaching the data without the [] operator is a little bit tr
 because of that, but this implementation is indeed very easy to do since the Vector
 class handles all the tedious operations like resizing, etc. 
 
-Resizing will be redone in the near future. Max size update will be 64 places.
+Resizing redone. Bigger than 64 sized vectors get their size increased by another 64
+places when needed. In other words, size increase becomes linear after 64 places.
 
 complex class is being included. Function definitions of the complex class are designed
 to use minimal RAM instead of the fastest option. Since there are 2 number in each complex
 number, speed won't make a big difference.
 
-My pathetic trial of Infinity and Undefined is also included.
-
 Vector and Matrix classes are further expanded to include more methods, primarily 
 comparison overloads.
+
+Range objects are implemented. You can even decide the step however you want.
+
+Complete restructuring of the files and some proper and working implementation of infinities
+is done.
