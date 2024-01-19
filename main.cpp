@@ -112,7 +112,7 @@ int main() {
     std::cout << Vector<double>::doesSpan(3, new_list) << std::endl;
 
     std::chrono::time_point<std::chrono::steady_clock> begin, end;
-    auto M = Matrix<int>::randMint(500, 500, -5, 5);
+    auto M = Matrix<int>::randMint(50, 50, -5, 5);
     std::cout << "Generation done" << std::endl;
     begin = std::chrono::steady_clock::now();
     auto det = M.determinant();

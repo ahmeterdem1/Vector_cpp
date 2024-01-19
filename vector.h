@@ -298,6 +298,15 @@ public:
         return *this;
     }
 
+    Vector<T> operator-() const {
+        T temp[this->length];
+        for (int i = 0; i < this->length; i++) {
+            temp[i] = - *(this->data + i);
+        }
+        Vector<T> result(this->length, temp);
+        return result;
+    }
+
     Vector<T> operator- (const T& a) const {
         T temp[this->length];
         for (int i = 0; i < this->length; i++) {

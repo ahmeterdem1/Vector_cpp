@@ -7,7 +7,6 @@
 
 #include "vector.h"
 
-
 template <typename T>
 class Matrix {
 
@@ -274,6 +273,21 @@ public:
             }
         }
         return *this;
+    }
+
+    Matrix<T> operator- () const {
+        Vector<T> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            T temp[this->b];
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                temp[j] = - *(v->data + j);
+            }
+            Vector<T> v_temp(this->b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<T> result(this->a, this->b, new_data);
+        return result;
     }
 
     Matrix<T> operator- (const T& val) const {
@@ -918,7 +932,6 @@ public:
         double first, rows_first;
         int first_index;
         double factor;
-
         auto copy_matrix = this->toDouble();
 
         // Bubble sort
@@ -963,7 +976,7 @@ public:
         return copy_matrix;
     }
 
-    double determinant(const std::string& method = "echelon") {
+    double determinant(const std::string& method = "echelon", const double& lowlimit = 0.0000000001, const double& highlimit = 1000000) {
         if (this->a != this->b) throw DimensionError();
         if (this->a == 1) {
             return *((*(this->data->data))->data);
@@ -975,7 +988,60 @@ public:
             }
             return Vector<T>::determinant(this->a, v_list);
         } else if (method == "echelon") {
-            return this->echelon().trace();
+            // Let's prevent the extra function call
+            Vector<double>* temp;
+            Vector<double>* v;
+            Vector<double>* w;
+            double first, rows_first;
+            int first_index;
+            double factor;
+            bool sign = true;
+            auto copy_matrix = this->toDouble();
+
+            // Bubble sort
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                        temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
+                        *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                        *(copy_matrix.data->data + j + 1) = temp;
+                        sign = !sign; // Each swap changes the sign of the determinant
+                    }
+                }
+            }
+
+            for (int i = 0; i < this->a; i++) {
+                v = *(copy_matrix.data->data + i);
+                for (int j = 0; j < this->b; j++) {
+                    if (*(v->data + j) != 0) {
+                        first = *(v->data + j);
+                        first_index = j;
+                        break;
+                    }
+                }
+                for (int r = i + 1; r < this->a; r++) {
+                    w = *(copy_matrix.data->data + r); // pointer to vector
+                    rows_first = *(w->data + first_index);
+                    if (abs(rows_first - 0) < lowlimit) continue;
+                    factor = rows_first / first;
+                    if (factor > highlimit) continue;
+                    *w -= factor * *v;
+                }
+            }
+
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                        temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
+                        *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                        *(copy_matrix.data->data + j + 1) = temp;
+                        sign = !sign;
+                    }
+                }
+            }
+
+            if (sign) return copy_matrix.trace();
+            return -copy_matrix.trace();
         }
     }
 };

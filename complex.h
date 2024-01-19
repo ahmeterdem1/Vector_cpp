@@ -6,7 +6,6 @@
 #define VECTOR_CPP_COMPLEX_H
 
 #include "functions.h"
-#include "helpers.h"
 #include <ostream>
 
 template <typename T>
@@ -96,6 +95,10 @@ public:
         this->real += static_cast<T>(c.real);
         this->imaginary += static_cast<T>(c.imaginary);
         return *this;
+    }
+
+    complex<T> operator- () const {
+        return complex<T>(-this->real, -this->imaginary);
     }
 
     complex<T> operator- (const T& val) const {
