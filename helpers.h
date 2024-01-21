@@ -8,6 +8,12 @@
 #define PI 3.1415926535
 #define E 2.718281828459
 #define DtoR 0.01745329252
+#define ln2 0.6931471805599569
+#define log2E 1.4426950408889392
+#define log2_10 3.3219280948873626
+#define sqrtPI 1.77245385091
+#define sqrt2 1.41421356237
+#define sqrt2PI 2.50662827463
 #define in :
 #define undefined NaN(2)
 

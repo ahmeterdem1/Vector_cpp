@@ -1,6 +1,12 @@
 #include <iostream>
 #include "vectorgebra.h"
 #include <chrono>
+#include <functional>
+
+
+double polynomial(double x) {
+    return 3 * pow(x, 2) - 2 * x + 1;
+}
 
 
 int main() {
@@ -120,5 +126,10 @@ int main() {
     std::chrono::duration<double> dur{end - begin};
     std::cout << "Time of determinant: " << dur.count() << std::endl;
     std::cout << det << std::endl;
+    std::cout << log2(32, 30) << std::endl;
+    std::cout << Sum<double, double>([] (double x) -> double {
+        return 1 / pow(2, x);
+    }, 0, 20) << std::endl;
+    std::cout << combination(5, 1) << std::endl;
     return 0;
 }
