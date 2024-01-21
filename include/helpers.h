@@ -5,6 +5,7 @@
 #ifndef VECTOR_CPP_HELPERS_H
 #define VECTOR_CPP_HELPERS_H
 
+// General mathematical constants
 #define PI 3.1415926535
 #define E 2.718281828459
 #define DtoR 0.01745329252
@@ -14,11 +15,42 @@
 #define sqrtPI 1.77245385091
 #define sqrt2 1.41421356237
 #define sqrt2PI 2.50662827463
-#define in :
-#define undefined NaN(2)
+#define in :    // This is for Pythonic for loops. I don't use it, but you may if you wish.
+#define undefined NaN(2) // Global undefined object, like Python-None, there is just one of it.
+                         // However, if you want, you can construct as many as you want.
+
+// Logger levels
+#define DEBUG 0
+#define INFO 1
+#define WARNING 2
+#define CRITICAL 3
+#define FATAL 4
+
+// Logger colors
+// These color definitions are from GitHub:
+// https://gist.github.com/Kielx/2917687bc30f567d45e15a4577772b02
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"
+#define RED     "\033[31m"   //CRITICAL - FATAL
+#define GREEN   "\033[32m"   //INFO
+#define YELLOW  "\033[33m"   //WARNING
+#define BLUE    "\033[34m"   //DEBUG
+#define MAGENTA "\033[35m"
+#define CYAN    "\033[36m"
+#define WHITE   "\033[37m"
+#define BOLDBLACK   "\033[1m\033[30m"
+#define BOLDRED     "\033[1m\033[31m"
+#define BOLDGREEN   "\033[1m\033[32m"
+#define BOLDYELLOW  "\033[1m\033[33m"
+#define BOLDBLUE    "\033[1m\033[34m"
+#define BOLDMAGENTA "\033[1m\033[35m"
+#define BOLDCYAN    "\033[1m\033[36m"
+#define BOLDWHITE   "\033[1m\033[37m"
 
 #include "exceptions.h"
 #include <ostream>
+#include <cstdio>
+#include <ctime>
 
 template <typename T>
 class Range {
@@ -246,5 +278,93 @@ NaN Infinity(const bool& sign = true) {
 NaN Undefined() {
     return undefined;
 }
+
+class Logger {
+    unsigned int level = INFO;
+    std::string name;
+    std::string format = "%-24s %-12s %-12s %s";
+
+public:
+    explicit Logger(const std::string& alias) {
+        this->name = alias;
+    }
+
+    void setLevel(const unsigned int& level_in) {
+        this->level = level_in % 5;
+    }
+
+    void setFormat(const std::string& f) {
+        this->format = f;
+    }
+
+    [[nodiscard]] unsigned int getLevel() const {
+        return this->level;
+    }
+
+    [[nodiscard]] std::string getName() const {
+        return this->name;
+    }
+
+    [[nodiscard]] std::string getFormat() const {
+        return this->format;
+    }
+
+    void debug(const std::string& message) const {
+        if (this->level <= DEBUG) {
+            // The time formatter in this class is from stack overflow:
+            // https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
+            time_t     now = time(0);
+            struct tm  tstruct;
+            char       buf[80];
+            tstruct = *localtime(&now);
+            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+            printf((BLUE + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "DEBUG", message.c_str());
+        }
+    }
+
+    void info(const std::string& message) const {
+        if (this->level <= INFO) {
+            time_t     now = time(0);
+            struct tm  tstruct;
+            char       buf[80];
+            tstruct = *localtime(&now);
+            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+            printf((GREEN + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "INFO", message.c_str());
+        }
+    }
+
+    void warning(const std::string& message) const {
+        if (this->level <= WARNING) {
+            time_t     now = time(0);
+            struct tm  tstruct;
+            char       buf[80];
+            tstruct = *localtime(&now);
+            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+            printf((YELLOW + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "WARNING", message.c_str());
+        }
+    }
+
+    void critical(const std::string& message) const {
+        if (this->level <= CRITICAL) {
+            time_t     now = time(0);
+            struct tm  tstruct;
+            char       buf[80];
+            tstruct = *localtime(&now);
+            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+            printf((RED + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "CRITICAL", message.c_str());
+        }
+    }
+
+    void fatal(const std::string& message) const {
+        if (this->level <= FATAL) {  // Which is always true in our case
+            time_t     now = time(0);
+            struct tm  tstruct;
+            char       buf[80];
+            tstruct = *localtime(&now);
+            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+            printf((RED + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "FATAL", message.c_str());
+        }
+    }
+};
 
 #endif //VECTOR_CPP_HELPERS_H

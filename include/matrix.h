@@ -95,6 +95,14 @@ public:
         this->data->insert(index, to_add);
     }
 
+    void clear() {
+        if (this->a == 0) return;
+        for (int i = 0; i < this->a; i++) {
+            (*(this->data->data + i))->clear();
+        }
+        this->data->clear();
+    }
+
     void resize() {
         this->data->resize();
     }
@@ -118,9 +126,9 @@ public:
         Vector<T> new_data[this->b];
         for (int i = 0; i < this->b; i++) {
             T temp[this->a];
-            auto v = *(this->data->data);
+            auto v = (this->data->data);
             for (int j = 0; j < this->a; j++) {
-                temp[j] = *((v->data + j) + i);
+                temp[j] = *((*(v + j))->data + i);
             }
             Vector<T> v_temp(this->a, temp);
             *(new_data + i) = v_temp;
@@ -573,6 +581,52 @@ public:
         }
         Vector<ctype<U>> result(this->b, temp);
         return result;
+    }
+
+    Matrix<T> operator*= (const T& val) {
+        for (int i = 0; i < this->a; i++) {
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(v->data + j) *= val;
+            }
+        }
+        return *this;
+    }
+
+    template <typename U>
+    Matrix<T> operator*= (const U& val) {
+        auto c = static_cast<T>(val);
+        for (int i = 0; i < this->a; i++) {
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(v->data + j) *= c;
+            }
+        }
+        return *this;
+    }
+
+    Matrix<T> operator*= (const Matrix<T>& m) {
+        if (this->b != m.a) throw DimensionError();
+        Vector<T> new_data[this->a]; // m.b is the length of each vector
+
+        for (int i = 0; i < this->a; i++) {
+            auto v = *(this->data->data + i); // pointer to basis vector copied, ~%2.5 faster for high dimensional matrices.
+            T temp[m.b];
+            for (int j = 0; j < m.b; j++) {
+                T sum = 0;
+                for (int k = 0; k < m.a; k++) {
+                    sum += *(v->data + k) * *((*(m.data->data + k))->data + j);
+                }
+                *(temp + j) = sum;
+            }
+            Vector<T> to_add(m.b, temp);
+            *(new_data + i) = to_add;
+        }
+
+        Matrix<T> result(this->a, m.b, new_data);
+        this->clear();
+        *this = result;
+        return *this;
     }
 
     template <typename U>
@@ -1040,8 +1094,51 @@ public:
                 }
             }
 
-            if (sign) return copy_matrix.trace();
-            return -copy_matrix.trace();
+            auto result = copy_matrix.trace();
+            copy_matrix.clear();
+            if (sign) return result;
+            return -result;
+        }
+    }
+
+    Matrix<double> inverse(const std::string& method = "iterative", const unsigned int& resolution = 15) const {
+        if (this->a == 0 or (this->a != this->b)) throw DimensionError();
+
+        if (method == "iterative") {
+            auto the_double = this->toDouble();
+            auto tpose = the_double.transpose();
+            auto control_matrix = the_double * tpose;
+
+            double sum_list[control_matrix.a];
+            for (int i = 0; i < control_matrix.a; i++) {
+                Vector<double>* v = *(control_matrix.data->data + i);
+                double sum = 0;
+                for (int j = 0; j < control_matrix.b; j++) {
+                    sum += abs(*(v->data + j));
+                }
+                *(sum_list + i) = sum;
+            }
+
+            double maxima = *sum_list;
+            for (int i = 1; i < control_matrix.a; i++) {
+                if (*(sum_list + i) > maxima) {
+                    maxima = *(sum_list + i);
+                }
+            }
+
+            auto guess = tpose / maxima;
+            auto iden = Matrix<double>::identity(this->a);
+            iden *= 2;
+
+            for (int i = 0; i < resolution; i++) {
+                guess = guess * (iden - the_double * guess);
+            }
+
+            control_matrix.clear();
+            iden.clear();
+            the_double.clear();
+            tpose.clear();
+            return guess;
         }
     }
 };

@@ -42,6 +42,14 @@ public:
         this->data = inn;
     }
 
+    /*
+    ~Vector() {
+        if (this->data != nullptr) {
+            delete[] this->data;
+        }
+    }
+    */
+
     unsigned int getsize() {
         return this->size;
     }

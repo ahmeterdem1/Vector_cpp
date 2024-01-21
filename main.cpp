@@ -1,11 +1,11 @@
 #include <iostream>
-#include "vectorgebra.h"
+#include "include/vectorgebra.h"
 #include <chrono>
 #include <functional>
 
 
 double polynomial(double x) {
-    return 3 * pow(x, 2) - 2 * x + 1;
+    return pow(x, 2) - 2 * x + 1;
 }
 
 
@@ -118,7 +118,7 @@ int main() {
     std::cout << Vector<double>::doesSpan(3, new_list) << std::endl;
 
     std::chrono::time_point<std::chrono::steady_clock> begin, end;
-    auto M = Matrix<int>::randMint(50, 50, -5, 5);
+    auto M = Matrix<int>::randMint(5, 5, -5, 5);
     std::cout << "Generation done" << std::endl;
     begin = std::chrono::steady_clock::now();
     auto det = M.determinant();
@@ -131,5 +131,30 @@ int main() {
         return 1 / pow(2, x);
     }, 0, 20) << std::endl;
     std::cout << combination(5, 1) << std::endl;
+    std::cout << v << std::endl;
+    std::cout << v.map<double>(polynomial) << std::endl;
+
+    auto logger = Logger("root");
+    logger.setLevel(DEBUG);
+    logger.debug("debug message");
+    logger.info("info message");
+    logger.warning("warning message");
+    logger.critical("critical message");
+    logger.fatal("fatal message");
+
+    double row1[3] = {1, 0, 2};
+    double row2[3] = {3, 2, 2};
+    double row3[3] = {0, 2, 2};
+
+    Vector<double> v1(3, row1);
+    Vector<double> v2(3, row2);
+    Vector<double> v3(3, row3);
+
+    Vector<double> list[3] = {v1, v2, v3};
+    Matrix<double> N(3, 3, list);
+
+    auto inv = N.inverse();
+    std::cout << std::endl << N * inv << std::endl << std::endl;
+
     return 0;
 }
