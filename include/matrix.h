@@ -39,7 +39,7 @@ public:
         }
         int i;
         for (i = 0; i < m.a; i++) {
-            Vector<T>* v = *(m.data->data + i);
+            auto v = *(m.data->data + i);
             o << "[";
             int j;
             for (j = 0; j < m.b - 1; j++) {
@@ -134,6 +134,10 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->b, this->a, new_data);
+        // Below loop clears the temporary vectors
+        for (int i = 0; i < this->b; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -149,6 +153,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -164,6 +171,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -181,6 +191,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -198,6 +211,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -215,6 +231,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -233,6 +252,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -295,6 +317,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -310,6 +335,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -325,6 +353,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -342,6 +373,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -359,6 +393,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -376,6 +413,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -394,6 +434,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -456,6 +499,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -471,6 +517,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<T> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -488,6 +537,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -505,6 +557,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<ctype<U>> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -526,6 +581,9 @@ public:
             *(new_data + i) = to_add;
         }
         Matrix<T> result(this->a, m.b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -548,6 +606,9 @@ public:
             *(new_data + i) = to_add;
         }
         Matrix<ctype<U>> result(this->a, m.b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -563,7 +624,7 @@ public:
             }
             *(temp + i) = sum;
         }
-        Vector<T> result(this->b, temp);
+        Vector<T> result(this->b, temp); // Heap only allocated here, and pointer to it is returned below
         return result;
     }
 
@@ -624,6 +685,9 @@ public:
         }
 
         Matrix<T> result(this->a, m.b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         this->clear();
         *this = result;
         return *this;
@@ -642,6 +706,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<double> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -707,6 +774,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<int> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -722,6 +792,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<float> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -737,6 +810,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<double> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -752,6 +828,9 @@ public:
             *(new_data + i) = v_temp;
         }
         Matrix<bool> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -765,6 +844,9 @@ public:
             *(new_data + i) = Vector<T>(b, temp);
         }
         Matrix<T> result(a, b, new_data);
+        for (int i = 0; i < a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -778,6 +860,9 @@ public:
             *(new_data + i) = Vector<T>(b, temp);
         }
         Matrix<T> result(a, b, new_data);
+        for (int i = 0; i < a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -792,6 +877,9 @@ public:
             *(new_data + i) = Vector<T>(d, temp);
         }
         Matrix<T> result(d, d, new_data);
+        for (int i = 0; i < d; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -805,6 +893,9 @@ public:
             *(new_data + i) = Vector<int>(n, temp);
         }
         Matrix<int> result(m, n, new_data);
+        for (int i = 0; i < m; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -818,6 +909,9 @@ public:
             *(new_data + i) = Vector<float>(n, temp);
         }
         Matrix<float> result(m, n, new_data);
+        for (int i = 0; i < m; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -831,6 +925,9 @@ public:
             *(new_data + i) = Vector<double>(n, temp);
         }
         Matrix<double> result(m, n, new_data);
+        for (int i = 0; i < m; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -844,6 +941,9 @@ public:
             *(new_data + i) = Vector<bool>(n, temp);
         }
         Matrix<bool> result(m, n, new_data);
+        for (int i = 0; i < m; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -867,6 +967,9 @@ public:
             remainder = *(temp + this->b - 1);
         }
         Matrix<T> result(this->a, this->b, list);
+        for (int i = 0; i < this->a; i++) {
+            (list + i)->clear();
+        }
         return result;
     }
 
@@ -899,6 +1002,9 @@ public:
             *(new_data + i) = Vector<T>(this->b, temp);
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -919,6 +1025,9 @@ public:
             *(new_data + i) = Vector<T>(this->b, temp);
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -939,6 +1048,9 @@ public:
             *(new_data + i) = Vector<T>(this->b, temp);
         }
         Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 
@@ -986,7 +1098,7 @@ public:
         double first, rows_first;
         int first_index;
         double factor;
-        auto copy_matrix = this->toDouble();
+        auto copy_matrix = this->toDouble(); // We will return this, we cannot clear it.
 
         // Bubble sort
         for (int i = 0; i < this->a; i++) {
