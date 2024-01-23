@@ -201,10 +201,11 @@ public:
         return *this;
     }
 
-    int __pivot(const double& limiter = 0.0000000000000000001) {
+    int __pivot(const double& limiter = 0.00001) {
         if (this->length == 0) return 0;
         for (int i = 0; i < this->length; i++) {
-            if (abs(*(this->data + i) - 0) < limiter) return i;
+            // This is sus?!?
+            if (abs(*(this->data + i)) > limiter) return i;
         }
         return this->length;
     }

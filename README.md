@@ -210,16 +210,14 @@ then find the data at the wanted index. There are a lot of indirection calls mad
 at each iteration. Pointer-to-row copying shortens this indirection process. It is
 measured to be around %2.5 faster for 500x500 random double valued matrix multiplication.
 
-No bitwise operations are overloaded, as those are deemed not necessary. For the most
-important operations; determinant and inverse, determinant is completed exactly the
-same as Vectorgebra/Python algorithmwise. Inverse only exists with the Newton method,
-more implementations will come in the near future. I don't plan to code the analytical
-method for inverses. It is completely unnecessary, and annoyingly slow. Gauss-Jordan
-is more than good enough for almost any inverse operation. I implemented the iterative
-method only for its algorithmic simplicity. A numerical methods library mostly don't need
-more than one method of calculation, if that one is good enough for any possible case.
-I will implement the Neumann method though. It might be much faster than all others
-for the right conditioned matrices. This is the only valid reason for implementing
+For the most important operations; determinant and inverse, determinant is completed exactly the
+same as Vectorgebra/Python algorithmwise. Iterative and Gauss Jordan methods exist for the inverse for now.
+I don't plan to code the analytical method for inverses. It is completely unnecessary, 
+and annoyingly slow. Gauss-Jordan is more than good enough for almost any inverse operation. 
+I implemented the iterative method only for its algorithmic simplicity. A numerical methods 
+library mostly don't need more than one method of calculation, if that one is good enough 
+for any possible case. I will implement the Neumann method though. It might be much faster 
+than all others for the right conditioned matrices. This is the only valid reason for implementing
 more than one algorithm for the same task. Conditional performance. It may be
 performing better for some specific conditions that might be desirable for the user.
 
@@ -248,6 +246,8 @@ the _reshape_ function. It is not a method here, but a separate function. The re
 for that is, it is a compound method. Because of the import loop, i cannot define it
 in any other header. In the future, there will be more functions in this header
 
+Complex conjugation for vectors and matrices are coded here.
+
 <br>
 
 ## General Notes
@@ -256,8 +256,9 @@ Don't code like:
 
 `std::cout << Matrix<int>::randMint(5, 5, 0, 5) * Matrix<int>::randMint(5, 5, 0, 5) << "\n";"`
 
-You just lost pointers to 2x5x5xsizeof(int) bytes of heap allocated memory. Good luck 
-finding it!
+You just lost pointers to 2x8x8xsizeof(int) bytes of heap allocated memory. (8 because the smart
+array will allocate 8 spaces for 5 length. The next power of 2 until reaching 64.) Good luck 
+finding them!
 
 Coding more procedurally is better for this libraries functionality. Store the return
 data of every function that returns something. This is not a problem of having no 

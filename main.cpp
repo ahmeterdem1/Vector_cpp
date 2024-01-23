@@ -153,8 +153,27 @@ int main() {
     Vector<double> list[3] = {v1, v2, v3};
     Matrix<double> N(3, 3, list);
 
-    auto inv = N.inverse();
-    std::cout << std::endl << N * inv << std::endl << std::endl;
 
+    double measurement = 0;
+
+    /*
+    for (int i = 0; i < 1000; i++) {
+        auto Q = Matrix<double>::randMdouble(500, 500, -5, 5);
+        begin = std::chrono::steady_clock::now();
+        auto inv = Q.inverse("gauss");
+        end = std::chrono::steady_clock::now();
+        dur = end - begin;
+        measurement += dur.count();
+    }
+    */
+
+    auto Q = Matrix<double>::randMdouble(500, 500, -5, 5);
+    begin = std::chrono::steady_clock::now();
+    auto inv = Q.inverse("gauss");
+    end = std::chrono::steady_clock::now();
+    dur = end - begin;
+    measurement += dur.count();
+
+    printf("Average time for 500x500 matrix inversion is %f seconds.", measurement);
     return 0;
 }

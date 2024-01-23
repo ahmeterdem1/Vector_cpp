@@ -1054,7 +1054,30 @@ public:
         return result;
     }
 
-    T trace() const {
+    template <typename U>
+    Matrix<U> map(std::function<U(T)> f) const {
+        if (this->a == 0) {
+            Matrix<U> result;
+            return result;
+        }
+        if (this->a != this->b) throw DimensionError();
+        Vector<T> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            T temp[this->b];
+            auto v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(temp + j) = f(*(v->data + j));
+            }
+            *(new_data + i) = Vector<T>(this->b, temp);
+        }
+        Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    }
+
+    [[nodiscard]] T mulDiagonal() const {
         if (this->a == 0) return 0;
         if (this->a != this->b) throw DimensionError();
         T mul = 1;
@@ -1064,7 +1087,7 @@ public:
         return mul;
     }
 
-    T sumDiagonal() const {
+    [[nodiscard]] T trace() const {
         if (this->a == 0) return 0;
         if (this->a != this->b) throw DimensionError();
         T sum = 0;
@@ -1103,7 +1126,7 @@ public:
         // Bubble sort
         for (int i = 0; i < this->a; i++) {
             for (int j = 0; j < this->a - i - 1; j++) {
-                if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
                     temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
                     *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
                     *(copy_matrix.data->data + j + 1) = temp;
@@ -1114,7 +1137,7 @@ public:
         for (int i = 0; i < this->a; i++) {
             v = *(copy_matrix.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                if (*(v->data + j) != 0) {
+                if (abs(*(v->data + j)) > lowlimit) {
                     first = *(v->data + j);
                     first_index = j;
                     break;
@@ -1123,22 +1146,118 @@ public:
             for (int r = i + 1; r < this->a; r++) {
                 w = *(copy_matrix.data->data + r); // pointer to vector
                 rows_first = *(w->data + first_index);
-                if (abs(rows_first - 0) < lowlimit) continue;
+                if (abs(rows_first) < lowlimit) continue;
                 factor = rows_first / first;
-                if (factor > highlimit) continue;
+                if (abs(factor) > highlimit) continue;
                 *w -= factor * *v;
             }
         }
 
         for (int i = 0; i < this->a; i++) {
             for (int j = 0; j < this->a - i - 1; j++) {
-                if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
                     temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
                     *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
                     *(copy_matrix.data->data + j + 1) = temp;
                 }
             }
         }
+        return copy_matrix;
+    }
+
+    Matrix<double> rrechelon(const double& lowlimit = 0.0000000000000000000001, const double& highlimit = 1000000000) {
+        Vector<double>* temp;
+        Vector<double>* v;
+        Vector<double>* w;
+        double first, rows_first;
+        int first_index;
+        double factor;
+        auto copy_matrix = this->toDouble(); // We will return this, we cannot clear it.
+
+        // Bubble sort
+        for (int i = 0; i < this->a; i++) {
+            for (int j = 0; j < this->a - i - 1; j++) {
+                if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
+                    *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                    *(copy_matrix.data->data + j + 1) = temp;
+                }
+            }
+        }
+
+        // Core of the reduction algorithm
+        // copy_matrix gets reduced.
+        for (int i = 0; i < this->a; i++) {
+            v = *(copy_matrix.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (abs(*(v->data + j)) > lowlimit) { // Assume zero if below lowlimit
+                    first = *(v->data + j);
+                    first_index = j;
+                    break;
+                }
+            }
+            for (int r = 0; r < this->a; r++) {
+                if (i == r) continue;
+                w = *(copy_matrix.data->data + r);
+                rows_first = *(w->data + first_index);
+                if (abs(rows_first) < lowlimit) continue;
+                factor = rows_first / first;
+                if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
+                *w -= factor * *v;
+            }
+        }
+
+        // Reverse the order of rows and reduce it again
+        // to get a Reduced Row Echelon form.
+        copy_matrix.reverse(); // Does not cause any memory leaks, works on self.
+
+        // Reduce again.
+        for (int i = 0; i < this->a; i++) {
+            v = *(copy_matrix.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                if (abs(*(v->data + j)) > lowlimit) {
+                    first = *(v->data + j);
+                    first_index = j;
+                    break;
+                }
+            }
+            for (int r = 0; r < this->a; r++) {
+                if (i == r) continue;
+                w = *(copy_matrix.data->data + r);
+                rows_first = *(w->data + first_index);
+                if (abs(rows_first) < lowlimit) continue;
+                factor = rows_first / first;
+                if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
+                *w -= factor * *v;
+            }
+        }
+
+        for (int i = 0; i < this->a; i++) {
+            for (int j = 0; j < this->a - i - 1; j++) {
+                if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    temp = *(copy_matrix.data->data + j);
+                    *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                    *(copy_matrix.data->data + j + 1) = temp;
+                }
+            }
+        }
+
+        // Error check on the last row
+        // It is guaranteed that below operations won't change the
+        // supposed row order
+        v = *(copy_matrix.data->data + this->a - 1);
+        first = *(v->data + this->b - 1);
+        if (abs(first) > lowlimit and abs(first) < highlimit) {
+            for (int i = 0; i < this->a - 1; i++) {
+                w = *(copy_matrix.data->data + i);
+                rows_first = *(w->data + this->b - 1);
+                if (abs(rows_first) < lowlimit) continue;
+                factor = rows_first / first;
+                if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
+                *w -= factor * *v;
+            }
+        }
+
         return copy_matrix;
     }
 
@@ -1162,42 +1281,12 @@ public:
             int first_index;
             double factor;
             bool sign = true;
-            auto copy_matrix = this->toDouble();
+            auto copy_matrix = this->toDouble(); // We will return this, we cannot clear it.
 
             // Bubble sort
             for (int i = 0; i < this->a; i++) {
                 for (int j = 0; j < this->a - i - 1; j++) {
-                    if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
-                        temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
-                        *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
-                        *(copy_matrix.data->data + j + 1) = temp;
-                        sign = !sign; // Each swap changes the sign of the determinant
-                    }
-                }
-            }
-
-            for (int i = 0; i < this->a; i++) {
-                v = *(copy_matrix.data->data + i);
-                for (int j = 0; j < this->b; j++) {
-                    if (*(v->data + j) != 0) {
-                        first = *(v->data + j);
-                        first_index = j;
-                        break;
-                    }
-                }
-                for (int r = i + 1; r < this->a; r++) {
-                    w = *(copy_matrix.data->data + r); // pointer to vector
-                    rows_first = *(w->data + first_index);
-                    if (abs(rows_first - 0) < lowlimit) continue;
-                    factor = rows_first / first;
-                    if (factor > highlimit) continue;
-                    *w -= factor * *v;
-                }
-            }
-
-            for (int i = 0; i < this->a; i++) {
-                for (int j = 0; j < this->a - i - 1; j++) {
-                    if ((**(copy_matrix.data->data + j)).__pivot() < (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
                         temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
                         *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
                         *(copy_matrix.data->data + j + 1) = temp;
@@ -1206,14 +1295,45 @@ public:
                 }
             }
 
-            auto result = copy_matrix.trace();
+            for (int i = 0; i < this->a; i++) {
+                v = *(copy_matrix.data->data + i);
+                for (int j = 0; j < this->b; j++) {
+                    if (abs(*(v->data + j)) > lowlimit) {
+                        first = *(v->data + j);
+                        first_index = j;
+                        break;
+                    }
+                }
+                for (int r = i + 1; r < this->a; r++) {
+                    w = *(copy_matrix.data->data + r); // pointer to vector
+                    rows_first = *(w->data + first_index);
+                    if (abs(rows_first) < lowlimit) continue;
+                    factor = rows_first / first;
+                    if (abs(factor) > highlimit) continue;
+                    *w -= factor * *v;
+                }
+            }
+
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                        temp = *(copy_matrix.data->data + j); // a pointer, we will just swap the pointers
+                        *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                        *(copy_matrix.data->data + j + 1) = temp;
+                        sign = !sign;
+                    }
+                }
+            }
+
+            auto result = copy_matrix.mulDiagonal();
             copy_matrix.clear();
             if (sign) return result;
             return -result;
         }
     }
 
-    Matrix<double> inverse(const std::string& method = "iterative", const unsigned int& resolution = 15) const {
+    [[nodiscard]] Matrix<double> inverse(const std::string& method = "iterative", const unsigned int& resolution = 15,
+                                         const double& lowlimit = 0.0000000001, const double& highlimit = 1000000) const {
         if (this->a == 0 or (this->a != this->b)) throw DimensionError();
 
         if (method == "iterative") {
@@ -1246,12 +1366,179 @@ public:
                 guess = guess * (iden - the_double * guess);
             }
 
+            // What if i make clear method act like "async"?
+            // At this point, we can just return the "guess" and
+            // Apply deletions in the background. No big deal.
             control_matrix.clear();
             iden.clear();
             the_double.clear();
             tpose.clear();
             return guess;
         }
+        else if (method == "gauss") {
+            Vector<double>* temp;
+            Vector<double>* v;
+            Vector<double>* w;
+
+            // Mirror pointers
+            Vector<double>* v_i;
+            Vector<double>* w_i;
+
+            double first, rows_first;
+            int first_index;
+            double factor;
+            auto copy_matrix = this->toDouble(); // We will return this, we cannot clear it.
+            auto iden = Matrix<double>::identity(this->a);
+
+            // Bubble sort
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                        // Swap the real matrix
+                        temp = *(copy_matrix.data->data + j);
+                        *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                        *(copy_matrix.data->data + j + 1) = temp;
+
+                        // Swap the mirror matrix
+                        temp = *(iden.data->data + j);
+                        *(iden.data->data + j) = *(iden.data->data + j + 1);
+                        *(iden.data->data + j + 1) = temp;
+                    }
+                }
+            }
+
+            // Core of the reduction algorithm
+            for (int i = 0; i < this->a; i++) {
+                v = *(copy_matrix.data->data + i);
+                v_i = *(iden.data->data + i);
+                for (int j = 0; j < this->a; j++) {
+                    if (abs(*(v->data + j)) > lowlimit) {
+                        first = *(v->data + j);
+                        first_index = j;
+                        break;
+                    }
+                }
+
+                for (int r = 0; r < this->a; r++) {
+                    if (i == r) continue;
+                    w = *(copy_matrix.data->data + r);
+                    w_i = *(iden.data->data + r);
+
+                    rows_first = *(w->data + first_index);
+                    if (abs(rows_first) < lowlimit) continue;
+                    factor = rows_first / first;
+                    if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
+                    *w -= factor * *v;
+                    *w_i -= factor * *v_i; // Mirror operation
+                }
+            }
+
+            copy_matrix.reverse();
+            iden.reverse();
+
+            // Reduce again.
+            for (int i = 0; i < this->a; i++) {
+                v = *(copy_matrix.data->data + i);
+                v_i = *(iden.data->data + i);
+                for (int j = 0; j < this->b; j++) {
+                    if (abs(*(v->data + j)) > lowlimit) {
+                        first = *(v->data + j);
+                        first_index = j;
+                        break;
+                    }
+                }
+                for (int r = i + 1; r < this->a; r++) {
+                    w = *(copy_matrix.data->data + r);
+                    w_i = *(iden.data->data + r);
+
+                    rows_first = *(w->data + first_index);
+                    if (abs(rows_first) < lowlimit) continue;
+                    factor = rows_first / first;
+                    if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
+                    *w -= factor * *v;
+                    *w_i -= factor * *v_i;
+                }
+            }
+
+            // Sort again.
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                        temp = *(copy_matrix.data->data + j);
+                        *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
+                        *(copy_matrix.data->data + j + 1) = temp;
+
+                        temp = *(iden.data->data + j);
+                        *(iden.data->data + j) = *(iden.data->data + j + 1);
+                        *(iden.data->data + j + 1) = temp;
+                    }
+                }
+            }
+
+            v = *(copy_matrix.data->data + this->a - 1);
+            v_i = *(iden.data->data + this->a - 1);
+            first = *(v->data + this->b - 1);
+            if (abs(first) > lowlimit and abs(first) < highlimit) {
+                for (int i = 0; i < this->a - 1; i++) {
+                    w = *(copy_matrix.data->data + i);
+                    w_i = *(iden.data->data + i);
+                    rows_first = *(w->data + this->b - 1);
+                    if (abs(rows_first) < lowlimit) continue;
+                    factor = rows_first / first;
+                    if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
+                    *w -= factor * *v;
+                    *w_i -= factor * *v_i;
+                }
+            }
+
+            //iden.reverse();
+            //copy_matrix.reverse();
+            for (int i = 0; i < this->a; i++) {
+                first = *((*(copy_matrix.data->data + i))->data + i);
+                if (abs(first) < lowlimit or abs(first) > highlimit) continue;
+                v_i = *(iden.data->data + i);
+                for (int j = 0; j < this->a; j++) {
+                    *(v_i->data + j) /= first;
+                    auto val = *(v_i->data + j);
+                    if (abs(val) < lowlimit or abs(val) > highlimit) {
+                        *(v_i->data + j) = 0;
+                    }
+                }
+            }
+
+            copy_matrix.clear();
+            return iden;
+        }
+
+        throw ArgumentError();
+    }
+
+    static Matrix<double> givens(const unsigned int& dim, const unsigned int& i, const unsigned int& j,
+                                 const double& angle, const unsigned int& resolution = 15) {
+        if (i >= dim or j >= dim or resolution == 0) throw RangeError();
+
+        auto result = Matrix<double>::identity(dim);
+        auto c = cos(angle, resolution);
+        auto s = sin(angle, resolution);
+
+        *((*(result.data->data + i))->data + i) = c;
+        *((*(result.data->data + j))->data + j) = c;
+        *((*(result.data->data + i))->data + j) = s;
+        *((*(result.data->data + j))->data + i) = -s;
+        return result;
+    }
+
+    template <typename U>
+    Vector<ctype<U>> leastSquares(const Vector<U>& v, const std::string& method = "iterative", const unsigned int& resolution = 15,
+                                const double& lowlimit = 0.0000000001, const double& highlimit = 1000000) const {
+        if (this->a != v.length or this->a == 0) throw DimensionError();
+
+        auto tpose = this->transpose();
+        auto temp = (tpose * *this).inverse(method, resolution, lowlimit, highlimit);
+        auto result = temp * (tpose * v);
+        temp.clear();
+        tpose.clear();
+        return result;
     }
 };
 

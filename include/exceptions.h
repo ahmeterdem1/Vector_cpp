@@ -43,4 +43,13 @@ public:
     }
 };
 
+class ArgumentError : public std::exception {
+public:
+    ArgumentError() = default;
+
+    const char* what() {
+        return "ArgumentError: Faulty configuration of argument(s)";
+    }
+};
+
 #endif //VECTOR_CPP_EXCEPTIONS_H

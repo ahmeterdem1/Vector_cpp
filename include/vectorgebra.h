@@ -50,6 +50,29 @@ Matrix<T> reshape(const Matrix<T>& m, const unsigned int& a, const unsigned int&
     return result;
 }
 
+template <typename T>
+Vector<complex<T>> conjugate(Vector<complex<T>> v) {
+    if (v.length == 0) return v;
+    for (int i = 0; i < v.length; i++) {
+        *(v.data + i) = (*(v.data + i)).conjugate();
+    }
+    return v;
+}
+
+template <typename T>
+Matrix<complex<T>> conjugate(Matrix<complex<T>> m) {
+    if (m.a == 0) return m;
+    for (int i = 0; i< m.a; i++) {
+        auto v = *(m.data->data + i);
+        for (int j = 0; j < m.b; j++) {
+            *(v->data + j) = (*(v->data + j)).conjugate();
+        }
+    }
+    return m;
+}
+
+
+
 typedef Vector<int> iVector;
 typedef Vector<float> fVector;
 typedef Vector<double> dVector;
