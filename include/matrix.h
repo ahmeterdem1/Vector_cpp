@@ -762,6 +762,66 @@ public:
         return true;
     }
 
+    template <typename U>
+    Matrix<bool> operator|| (const Matrix<U>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<bool> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            bool temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(temp + j) = *(v->data + j) || *(w->data + j);
+            }
+            *(new_data + i) = Vector<bool>(this->b, temp);
+        }
+        Matrix<bool> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    }
+
+    template <typename U>
+    Matrix<bool> operator&& (const Matrix<U>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<bool> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            bool temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(temp + j) = *(v->data + j) && *(w->data + j);
+            }
+            *(new_data + i) = Vector<bool>(this->b, temp);
+        }
+        Matrix<bool> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    }
+
+    template <typename U>
+    Matrix<bool> operator^ (const Matrix<U>& m) const {
+        if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<bool> new_data[this->a];
+        for (int i = 0; i < this->a; i++) {
+            bool temp[this->b];
+            auto v = *(this->data->data + i);
+            auto w = *(m.data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(temp + j) = *(v->data + j) ^ *(w->data + j);
+            }
+            *(new_data + i) = Vector<bool>(this->b, temp);
+        }
+        Matrix<bool> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    }
+
     [[nodiscard]] Matrix<int> toInt() const {
         Vector<int> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
@@ -1384,16 +1444,15 @@ public:
             Vector<double>* v_i;
             Vector<double>* w_i;
 
-            double first, rows_first;
+            double first, rows_first, factor;
             int first_index;
-            double factor;
             auto copy_matrix = this->toDouble(); // We will return this, we cannot clear it.
             auto iden = Matrix<double>::identity(this->a);
 
             // Bubble sort
             for (int i = 0; i < this->a; i++) {
                 for (int j = 0; j < this->a - i - 1; j++) {
-                    if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    if ((*(copy_matrix.data->data + j))->__pivot() > (*(copy_matrix.data->data + j + 1))->__pivot()) {
                         // Swap the real matrix
                         temp = *(copy_matrix.data->data + j);
                         *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
@@ -1433,6 +1492,9 @@ public:
                 }
             }
 
+            // There is a possibility that below code can be written
+            // without applying .reverse() operation.
+            // Just changing the indexes of the loops is enough
             copy_matrix.reverse();
             iden.reverse();
 
@@ -1463,7 +1525,7 @@ public:
             // Sort again.
             for (int i = 0; i < this->a; i++) {
                 for (int j = 0; j < this->a - i - 1; j++) {
-                    if ((**(copy_matrix.data->data + j)).__pivot() > (**(copy_matrix.data->data + j + 1)).__pivot()) {
+                    if ((*(copy_matrix.data->data + j))->__pivot() > (*(copy_matrix.data->data + j + 1))->__pivot()) {
                         temp = *(copy_matrix.data->data + j);
                         *(copy_matrix.data->data + j) = *(copy_matrix.data->data + j + 1);
                         *(copy_matrix.data->data + j + 1) = temp;
@@ -1491,8 +1553,6 @@ public:
                 }
             }
 
-            //iden.reverse();
-            //copy_matrix.reverse();
             for (int i = 0; i < this->a; i++) {
                 first = *((*(copy_matrix.data->data + i))->data + i);
                 if (abs(first) < lowlimit or abs(first) > highlimit) continue;
@@ -1538,6 +1598,153 @@ public:
         auto result = temp * (tpose * v);
         temp.clear();
         tpose.clear();
+        return result;
+    }
+
+    Matrix<double>* QR(const double& limiter = 0.0000000001) const {
+        if (this->a == 0) return nullptr;
+
+        Vector<double> vlist[this->b];
+        auto the_double = this->toDouble();
+        auto tpose = the_double.transpose();
+
+        for (int i = 0; i < this->b; i++) {
+            *(vlist + i) = **(tpose.data->data + i); // Direct copy of the columns of the self
+        }
+
+        // Definition of spanify
+        *vlist = vlist->unit();
+        for (int i = 1; i < this->b; i++) {
+            for (int j = 0; j < i; j++) {
+                *(vlist + i) -= (vlist + i)->proj(*(vlist + j));
+            }
+            *(vlist + i) = (vlist + i)->unit();
+        }
+
+        for (int i = 0; i < this->b; i++) {
+            for (int j = i + 1; j < this->b; j++) {
+                if (*(vlist + i) * *(vlist + j) > limiter) {
+                    // Memory cleaning before returning
+                    the_double.clear();
+                    tpose.clear();
+                    return nullptr; // The false case of vector.doesSpan
+                }
+            }
+        }
+
+        auto results = new Matrix<double>[2];
+
+        auto Q_t = Matrix<double>(this->b, this->a, vlist); // Will be cleared later
+
+        Vector<double> new_data[Q_t.b];
+        for (int i = 0; i < Q_t.b; i++) {
+            double temp[Q_t.a];
+            auto v = (Q_t.data->data);
+            for (int j = 0; j < Q_t.a; j++) {
+                temp[j] = *((*(v + j))->data + i);
+            }
+            Vector<double> v_temp(Q_t.a, temp);
+            *(new_data + i) = v_temp;
+        }
+        auto Q = Matrix<double>(Q_t.b, Q_t.a, new_data);
+        // Below loop clears the temporary vectors
+        for (int i = 0; i < Q_t.b; i++) {
+            (new_data + i)->clear();
+        }
+
+        // Q_t * *this
+        Vector<double> new_data2[Q_t.a];
+        for (int i = 0; i < Q_t.a; i++) {
+            auto v = *(Q_t.data->data + i);
+            double temp[this->b];
+            for (int j = 0; j < this->b; j++) {
+                double sum = 0;
+                for (int k = 0; k < this->a; k++) {
+                    sum += *(v->data + k) * *((*(this->data->data + k))->data + j);
+                }
+                *(temp + j) = sum;
+            }
+            Vector<double> to_add(this->b, temp);
+            *(new_data2 + i) = to_add;
+        }
+
+        auto R = Matrix<double>(Q_t.a, this->b, new_data2);
+        for (int i = 0; i < Q_t.a; i++) {
+            (new_data2 + i)->clear();
+        }
+
+        Q_t.clear();
+        the_double.clear();
+        tpose.clear();
+        results[0] = Q;
+        results[1] = R;
+        return results;
+    }
+
+    double* eigenvalue(const unsigned int& resolution = 15) const {
+        // This will return a heap allocated array of length this->a
+        if (this->a != this->b) throw DimensionError();
+        if (resolution == 0) throw RangeError();
+
+        auto the_double = this->toDouble();
+        for (int i = 0; i < resolution; i++) {
+            auto qr = the_double.QR(); // Allocates heap
+            the_double.clear(); // ALWAYS clear before REASSIGNMENT
+
+            the_double = qr[1] * qr[0];
+
+            qr[1].clear();
+            qr[0].clear();
+            delete[] qr;
+        }
+
+        auto results = new double[this->a];
+        // Data transfer
+        for (int i = 0; i < this->a; i++) {
+            *(results + i) = *((*(the_double.data->data + i))->data + i);
+        }
+        the_double.clear(); // It exited the loop filled
+        return results;
+    }
+
+    template <typename U>
+    static double frobeniousProduct(const Matrix<T>& m, const Matrix<U>& n) {
+        // T or U CANNOT be complex
+        if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
+        if ((m.a == 0) or (n.a == 0)) throw RangeError();
+        double sum = 0;
+        for (int i = 0; i < m.a; i++) {
+            auto v = *(m.data->data + i);
+            auto w = *(n.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                sum += *(v->data + j) * *(w->data + i);
+            }
+        }
+        return sum;
+    }
+
+    // Negative indexing is allowed here
+    [[nodiscard]] Matrix<T> submatrix(int a, int b, int c, int d) const {
+        if (a < 0) a += this->a; // from [
+        if (b < 0) b += this->a; // until )
+        if (c < 0) c += this->b; // from [
+        if (d < 0) d += this->b; // until )
+        if ((a < 0 or a > this->a) or (b < 0 or b > this->a) or a >= b
+        or (c < 0 or c > this->b) or (d < 0 or d > this->b) or c >= d) throw RangeError();
+
+        Vector<T> new_data[b - a];
+        for (int i = a; i < b; i++) {
+            auto v = *(this->data->data + i);
+            T temp[d - c];
+            for (int j = c; j < d; j++) {
+                *(temp + j - c) = *(v->data + j);
+            }
+            *(new_data + i - a) = Vector<T>(d - c, temp);
+        }
+        Matrix<T> result(b - a, d - c, new_data);
+        for (int i = 0; i < b - a; i++) {
+            (new_data + i)->clear();
+        }
         return result;
     }
 };

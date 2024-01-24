@@ -18,17 +18,6 @@ int main() {
     Vector<int> w(3, temp2);
     Vector<int> q(3, temp3);
 
-    Vector<double> v_list_last[10] = {Vector<double>::randVdouble(10, -3, 3),
-                                     Vector<double>::randVdouble(10, -3, 3),
-                                     Vector<double>::randVdouble(10, -3, 3),
-                                     Vector<double>::randVdouble(10, -3, 3),
-                                     Vector<double>::randVdouble(10, -3, 3),
-                                      Vector<double>::randVdouble(10, -3, 3),
-                                      Vector<double>::randVdouble(10, -3, 3),
-                                      Vector<double>::randVdouble(10, -3, 3),
-                                      Vector<double>::randVdouble(10, -3, 3),
-                                      Vector<double>::randVdouble(10, -3, 3)};
-
 
     Vector<int> v_list[3];
     Vector<int> v_list2[2];
@@ -48,9 +37,9 @@ int main() {
     std::cout << r << std::endl;
     std::cout << v * r << " ?==? " << v.len() * r.len();
     for (int i = 0; i < 10; i++) std::cout << randint(-5, 3) << std::endl;
-    std::cout << Vector<int>::randVint(5, 0, 10) << std::endl;
+    std::cout << Vector<int>::randVint(5, 0, 10) << std::endl; // Memory leak
 
-    std::cout << Vector<int>::cross(2, v_list2) << std::endl;
+    std::cout << Vector<int>::cross(2, v_list2) << std::endl; // Memory leak
 
     Matrix<int> m(2, 3, v_list2);
 
@@ -63,23 +52,23 @@ int main() {
     m.pop();
     std::cout << m << std::endl;
     std::cout << std::endl;
-    std::cout << m + 1 << std::endl;
+    std::cout << m + 1 << std::endl; // Memory leak
     std::cout << std::endl;
-    std::cout << m.transpose() << std::endl;
+    std::cout << m.transpose() << std::endl; // Memory leak
     std::cout << std::endl;
-    std::cout << m - m << std::endl;
+    std::cout << m - m << std::endl; // Memory leak
     std::cout << std::endl;
     std::cout << m[0][2] << std::endl;
-    std::cout << m / 3<< std::endl;
+    std::cout << m / 3<< std::endl; // Memory leak
     std::cout << std::endl;
-    std::cout << m * m.transpose() << std::endl;
+    std::cout << m * m.transpose() << std::endl; // Memory leak
     Matrix<double> n;
     n.append(Vector<double>::randVdouble(2, 0, 2));
     n.append(Vector<double>::randVdouble(2, -2, 5));
     n.append(Vector<double>::randVdouble(2, -3, 0));
-    std::cout << n * m << std::endl;
-    std::cout << 0.5 * m << std::endl;
-    std::cout << Matrix<float>::randMfloat(3, 3, -2, 2) << std::endl;
+    std::cout << n * m << std::endl; // Memory leak
+    std::cout << 0.5 * m << std::endl; // Memory leak
+    std::cout << Matrix<float>::randMfloat(3, 3, -2, 2) << std::endl; // Memory leak
 
     /*
     std::chrono::time_point<std::chrono::steady_clock> begin, end;
@@ -91,9 +80,9 @@ int main() {
     */
     std::cout << v << std::endl;
     std::cout << Matrix<int>::identity(3) * v << std::endl;
-    std::cout << v.cumsum() << std::endl;
+    std::cout << v.cumsum() << std::endl; // Memory leak
     std::cout << (v == v) << std::endl;
-    std::cout << (v >= w.toFloat()) << std::endl;
+    std::cout << (v >= w.toFloat()) << std::endl; // Memory leak
     std::cout << m.cumsum() << std::endl;
     std::cout << m.sum() << std::endl;
     std::cout << v.sum() << std::endl;
@@ -132,7 +121,7 @@ int main() {
     }, 0, 20) << std::endl;
     std::cout << combination(5, 1) << std::endl;
     std::cout << v << std::endl;
-    std::cout << v.map<double>(polynomial) << std::endl;
+    std::cout << v.map<double>(polynomial) << std::endl; // Memory leak
 
     auto logger = Logger("root");
     logger.setLevel(DEBUG);
@@ -153,27 +142,56 @@ int main() {
     Vector<double> list[3] = {v1, v2, v3};
     Matrix<double> N(3, 3, list);
 
-
+    Matrix<double> inv;
+    Matrix<double>* res;
     double measurement = 0;
-
-    /*
     for (int i = 0; i < 1000; i++) {
-        auto Q = Matrix<double>::randMdouble(500, 500, -5, 5);
+        auto Q = Matrix<double>::randMdouble(20, 20, -5, 5);
         begin = std::chrono::steady_clock::now();
-        auto inv = Q.inverse("gauss");
+        //inv = Q.inverse("gauss");
+        res = Q.QR();
         end = std::chrono::steady_clock::now();
+        res[0].clear();
+        res[1].clear();
+        delete[] res;
         dur = end - begin;
         measurement += dur.count();
     }
-    */
+    printf("Average time of 20x20 matrix qr decomposition is %f seconds.\n", measurement / 1000);
 
-    auto Q = Matrix<double>::randMdouble(500, 500, -5, 5);
-    begin = std::chrono::steady_clock::now();
-    auto inv = Q.inverse("gauss");
-    end = std::chrono::steady_clock::now();
-    dur = end - begin;
-    measurement += dur.count();
+    auto qr = M.QR();
 
-    printf("Average time for 500x500 matrix inversion is %f seconds.", measurement);
+    std::cout << M << std::endl << std::endl;
+    std::cout << qr[0] << std::endl << std::endl;
+    std::cout << qr[1] << std::endl << std::endl;
+    std::cout << qr[0] * qr[1] << std::endl << std::endl;
+
+    auto eigs = M.eigenvalue();
+    for (int i = 0; i < M.a; i++) { // Length of the list is equal to the dimensions of the matrix associated.
+        std::cout << *(eigs + i) << std::endl;
+    }
+
+    auto sub = M.submatrix(0, 3, 1, 5);
+    std::cout << sub << std::endl;
+
+    // Memory cleaning from left over objects
+    // Lines that have "// Memory Leak" at the end
+    // have memory leaks that cannot be resolved.
+    // Reasons and how to avoid it is explained
+    // in the README.md extensively.
+    delete[] eigs;
+    qr[0].clear();
+    qr[1].clear();
+    sub.clear();
+    M.clear();
+    N.clear();
+    n.clear();
+    v.clear();
+    w.clear();
+    q.clear();
+    r.clear();
+    v1.clear();
+    v2.clear();
+    v3.clear();
     return 0;
 }

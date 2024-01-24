@@ -19,6 +19,9 @@ to be ~4600 times faster in Vectorgebra/C++ than Vectorgebra/Python3.11. Determi
 is of course calculated via the echelon method. Analytic would never return regardless
 of the language.
 
+Project is coming to a finish, as there have been few functions left from Vectorgebra/Python
+to add. A Vectorgebra/Python-like documentation and tutorial coming soon!
+
 ## File Structure
 
 There are a total of 7 header files. _vectorgebra.h_ is the file that collects all the 
@@ -252,6 +255,8 @@ Complex conjugation for vectors and matrices are coded here.
 
 ## General Notes
 
+### How to keep memory safe
+
 Don't code like:
 
 `std::cout << Matrix<int>::randMint(5, 5, 0, 5) * Matrix<int>::randMint(5, 5, 0, 5) << "\n";"`
@@ -260,8 +265,19 @@ You just lost pointers to 2x8x8xsizeof(int) bytes of heap allocated memory. (8 b
 array will allocate 8 spaces for 5 length. The next power of 2 until reaching 64.) Good luck 
 finding them!
 
-Coding more procedurally is better for this libraries functionality. Store the return
-data of every function that returns something. This is not a problem of having no 
-destructors. Above code is equivalent to using malloc() and not copying its return
-value to a variable. Don't do it. I don't use smart pointers. I should have maybe, 
-but here we are. Basic pointers are faster, and they require careful handling. 
+This is not a problem of having no destructors. Above code is equivalent to using malloc() 
+and not copying its return value to a variable. Don't do it. I don't use smart pointers. 
+I should have maybe, but here we are. Basic pointers are faster, and they require careful 
+handling.
+
+The consistent rule of memory allocation in this library is that, except complex class,
+every _Matrix-Vector-Pointer_ returning _const_ labeled function/method allocates heap
+memory that you will have to delete manually.
+
+Apply functional programming patterns to your code. Go step by step. Always hold the
+return information of functions.
+
+<hr>
+
+Naming convention is consistently Camel Case here. It was mostly Camel Case in the Vectorgebra/Python,
+but it was not consistent.

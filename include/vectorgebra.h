@@ -71,7 +71,50 @@ Matrix<complex<T>> conjugate(Matrix<complex<T>> m) {
     return m;
 }
 
+template <typename T, typename U>
+complex<double> frobeniousProduct(const Matrix<complex<T>>& m, const Matrix<complex<U>>& n) {
+    if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
+    if ((m.a == 0) or (n.a == 0)) throw RangeError();
+    complex<double> sum;
+    for (int i = 0; i < m.a; i++) {
+        auto v = *(m.data->data + i);
+        auto w = *(n.data->data + i);
+        for (int j = 0; j < m.b; j++) {
+            sum += (*(v->data + j)).conjugate() * (*(w->data + i)).conjugate();
+        }
+    }
+    return sum;
+}
 
+template <typename T, typename U>
+complex<double> frobeniousProduct(const Matrix<T>& m, const Matrix<complex<U>>& n) {
+    if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
+    if ((m.a == 0) or (n.a == 0)) throw RangeError();
+    complex<double> sum;
+    for (int i = 0; i < m.a; i++) {
+        auto v = *(m.data->data + i);
+        auto w = *(n.data->data + i);
+        for (int j = 0; j < m.b; j++) {
+            sum += *(v->data + j) * (*(w->data + i)).conjugate();
+        }
+    }
+    return sum;
+}
+
+template <typename T, typename U>
+double frobeniousProduct(const Matrix<T>& m, const Matrix<U>& n) {
+    if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
+    if ((m.a == 0) or (n.a == 0)) throw RangeError();
+    double sum = 0;
+    for (int i = 0; i < m.a; i++) {
+        auto v = *(m.data->data + i);
+        auto w = *(n.data->data + i);
+        for (int j = 0; j < m.b; j++) {
+            sum += *(v->data + j) * *(w->data + i);
+        }
+    }
+    return sum;
+}
 
 typedef Vector<int> iVector;
 typedef Vector<float> fVector;

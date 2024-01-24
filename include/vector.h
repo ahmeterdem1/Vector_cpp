@@ -638,6 +638,39 @@ public:
         return sum1 <= 0;
     }
 
+    template <typename U>
+    Vector<bool> operator|| (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        bool temp[this->length];
+        for (int i = 0; i < this->length; i++) {
+            *(temp + i) = *(this->data + i) || *(v.data + i);
+        }
+        Vector<bool> result(this->length, temp);
+        return result;
+    }
+
+    template <typename U>
+    Vector<bool> operator&& (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        bool temp[this->length];
+        for (int i = 0; i < this->length; i++) {
+            *(temp + i) = *(this->data + i) && *(v.data + i);
+        }
+        Vector<bool> result(this->length, temp);
+        return result;
+    }
+
+    template <typename U>
+    Vector<bool> operator^ (const Vector<U>& v) const {
+        if (this->length != v.length) throw DimensionError();
+        bool temp[this->length];
+        for (int i = 0; i < this->length; i++) {
+            *(temp + i) = *(this->data + i) ^ *(v.data + i);
+        }
+        Vector<bool> result(this->length, temp);
+        return result;
+    }
+
     [[nodiscard]] T dot (const Vector<T>& v) const {
         if (this->length != v.length) throw DimensionError();
         T sum = 0;
