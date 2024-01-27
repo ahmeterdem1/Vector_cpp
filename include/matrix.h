@@ -38,8 +38,9 @@ public:
             return o;
         }
         int i;
+        Vector<T>* v;
         for (i = 0; i < m.a; i++) {
-            auto v = *(m.data->data + i);
+            v = *(m.data->data + i);
             o << "[";
             int j;
             for (j = 0; j < m.b - 1; j++) {
@@ -103,6 +104,55 @@ public:
         this->data->clear();
     }
 
+    Matrix<T> copy() const {
+        if (this->a == 0) {
+            Matrix<T> result;
+            return result;
+        }
+        Vector<T> new_data[this->a];
+        Vector<T>* v;
+        for (int i = 0; i < this->a; i++) {
+            T temp[this->b];
+            v = *(this->data->data + i);
+            for (int j = 0; j < this->b; j++) {
+                *(temp + j) = *(v->data + j);
+            }
+            *(new_data + i) = Vector<T>(this->b, temp);
+        }
+        Matrix<T> result(this->a, this->b, new_data);
+        for (int i = 0; i < this->a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    }
+
+    void sort(const bool& reverse = false) {
+        if (this->a == 0) return;
+        Vector<T>* temp;
+        // Sorts by pivot indexes
+        if (reverse) {
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((*(this->data->data + j))->__pivot() < (*(this->data->data + j + 1))->__pivot()) {
+                        temp = *(this->data->data + j);
+                        *(this->data->data + j) = *(this->data->data + j + 1);
+                        *(this->data->data + j + 1) = temp;
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < this->a; i++) {
+                for (int j = 0; j < this->a - i - 1; j++) {
+                    if ((*(this->data->data + j))->__pivot() > (*(this->data->data + j + 1))->__pivot()) {
+                        temp = *(this->data->data + j);
+                        *(this->data->data + j) = *(this->data->data + j + 1);
+                        *(this->data->data + j + 1) = temp;
+                    }
+                }
+            }
+        }
+    }
+
     void resize() {
         this->data->resize();
     }
@@ -124,9 +174,10 @@ public:
 
     [[nodiscard]] Matrix<T> transpose() const {
         Vector<T> new_data[this->b];
+        Vector<T>** v;
         for (int i = 0; i < this->b; i++) {
             T temp[this->a];
-            auto v = (this->data->data);
+            v = (this->data->data);
             for (int j = 0; j < this->a; j++) {
                 temp[j] = *((*(v + j))->data + i);
             }
@@ -143,9 +194,10 @@ public:
 
     Matrix<T> operator+ (const T& val) const {
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = *(v->data + j) + val;
             }
@@ -181,9 +233,10 @@ public:
     Matrix<ctype<U>> operator+ (const U& val) const {
         Vector<ctype<U>> new_data[this->a];
         auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = static_cast<ctype<U>>(*(v->data + j)) + c;
             }
@@ -201,9 +254,10 @@ public:
     friend Matrix<ctype<U>> operator+ (const U& val, const Matrix<T>& m) {
         Vector<ctype<U>> new_data[m.a];
         auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
         for (int i = 0; i < m.a; i++) {
             ctype<U> temp[m.b];
-            auto v = *(m.data->data + i);
+            v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
                 temp[j] = static_cast<ctype<U>>(*(v->data + j)) + c;
             }
@@ -220,10 +274,12 @@ public:
     Matrix<T> operator+ (const Matrix<T>& m) const {
         if ((this->a != m.a) and (this->b != m.b)) throw DimensionError();
         Vector<T> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = *(v->data + j) + *(w->data + j);
             }
@@ -241,10 +297,12 @@ public:
     Matrix<ctype<U>> operator+ (const Matrix<U>& m) const {
         if ((this->a != m.a) and (this->b != m.b)) throw DimensionError();
         Vector<ctype<U>> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = static_cast<ctype<U>>(*(v->data + j)) + static_cast<ctype<U>>(*(w->data + j));
             }
@@ -259,8 +317,9 @@ public:
     }
 
     Matrix<T> operator+= (const T& val) {
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) += val;
             }
@@ -271,8 +330,9 @@ public:
     template <typename U>
     Matrix<T> operator+= (const U& val) {
         T temp = static_cast<T>(val);
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) += temp;
             }
@@ -282,9 +342,11 @@ public:
 
     Matrix<T> operator+= (const Matrix<T>& m) {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) += *(w->data + j);
             }
@@ -295,9 +357,11 @@ public:
     template <typename U>
     Matrix<T> operator+= (const Matrix<U>& m) {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) += static_cast<T>(*(w->data + j));
             }
@@ -307,9 +371,10 @@ public:
 
     Matrix<T> operator- () const {
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = - *(v->data + j);
             }
@@ -325,9 +390,10 @@ public:
 
     Matrix<T> operator- (const T& val) const {
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = *(v->data + j) - val;
             }
@@ -343,9 +409,10 @@ public:
 
     friend Matrix<T> operator- (const T& val, const Matrix<T>& m) {
         Vector<T> new_data[m.a];
+        Vector<T>* v;
         for (int i = 0; i < m.a; i++) {
             T temp[m.b];
-            auto v = *(m.data->data + i);
+            v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
                 temp[j] = val - *(v->data + j);
             }
@@ -363,9 +430,10 @@ public:
     Matrix<ctype<U>> operator- (const U& val) const {
         Vector<ctype<U>> new_data[this->a];
         auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = static_cast<ctype<U>>(*(v->data + j)) - c;
             }
@@ -383,9 +451,10 @@ public:
     friend Matrix<ctype<U>> operator- (const U& val, const Matrix<T>& m) {
         Vector<ctype<U>> new_data[m.a];
         auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
         for (int i = 0; i < m.a; i++) {
             ctype<U> temp[m.b];
-            auto v = *(m.data->data + i);
+            v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
                 temp[j] = c - static_cast<ctype<U>>(*(*v->data + j));
             }
@@ -402,10 +471,12 @@ public:
     Matrix<T> operator- (const Matrix<T>& m) const {
         if ((this->a != m.a) and (this->b != m.b)) throw DimensionError();
         Vector<T> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = *(v->data + j) - *(w->data + j);
             }
@@ -423,10 +494,12 @@ public:
     Matrix<ctype<U>> operator- (const Matrix<U>& m) const {
         if ((this->a != m.a) and (this->b != m.b)) throw DimensionError();
         Vector<ctype<U>> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = static_cast<ctype<U>>(*(v->data + j)) - static_cast<ctype<U>>(*(w->data + j));
             }
@@ -441,8 +514,9 @@ public:
     }
 
     Matrix<T> operator-= (const T& val) {
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) -= val;
             }
@@ -453,8 +527,9 @@ public:
     template <typename U>
     Matrix<T> operator-= (const U& val) {
         T temp = static_cast<T>(val);
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) -= temp;
             }
@@ -464,9 +539,11 @@ public:
 
     Matrix<T> operator-= (const Matrix<T>& m) {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) -= *(w->data + j);
             }
@@ -477,9 +554,11 @@ public:
     template <typename U>
     Matrix<T> operator-= (const Matrix<U>& m) {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) -= static_cast<T>(*(w->data + j));
             }
@@ -489,9 +568,10 @@ public:
 
     Matrix<T> operator* (const T& val) const {
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = *(v->data + j) * val;
             }
@@ -507,9 +587,10 @@ public:
 
     friend Matrix<T> operator* (const T& val, const Matrix<T>& m) {
         Vector<T> new_data[m.a];
+        Vector<T>* v;
         for (int i = 0; i < m.a; i++) {
             T temp[m.b];
-            auto v = *(m.data->data + i);
+            v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
                 temp[j] = val * *(v->data + j);
             }
@@ -527,9 +608,10 @@ public:
     Matrix<ctype<U>> operator* (const U& val) const {
         Vector<ctype<U>> new_data[this->a];
         auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             ctype<U> temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 temp[j] = static_cast<ctype<U>>(*(v->data + j)) * c;
             }
@@ -547,9 +629,10 @@ public:
     friend Matrix<ctype<U>> operator* (const U& val, const Matrix<T>& m) {
         Vector<ctype<U>> new_data[m.a];
         auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
         for (int i = 0; i < m.a; i++) {
             ctype<U> temp[m.b];
-            auto v = *(m.data->data + i);
+            v = *(m.data->data + i);
             for (int j = 0; j < m.b; j++) {
                 *(temp + j) = c * static_cast<ctype<U>>(*(v->data + j));
             }
@@ -566,9 +649,10 @@ public:
     Matrix<T> operator* (const Matrix<T>& m) const {
         if (this->b != m.a) throw DimensionError();
         Vector<T> new_data[this->a]; // m.b is the length of each vector
+        Vector<T>* v;
 
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i); // pointer to basis vector copied, ~%2.5 faster for high dimensional matrices.
+            v = *(this->data->data + i); // pointer to basis vector copied, ~%2.5 faster for high dimensional matrices.
             T temp[m.b];
             for (int j = 0; j < m.b; j++) {
                 T sum = 0;
@@ -591,9 +675,10 @@ public:
     Matrix<ctype<U>> operator* (const Matrix<U>& m) const {
         if (this->b != m.a) throw DimensionError();
         Vector<ctype<U>> new_data[this->a]; // m.b is the length of each vector
+        Vector<T>* v;
 
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i); // basis vector copied
+            v = *(this->data->data + i); // basis vector copied
             ctype<U> temp[m.b];
             for (int j = 0; j < m.b; j++) {
                 ctype<U> sum = 0;
@@ -616,8 +701,9 @@ public:
         if (this->b != v.length) throw DimensionError();
         T temp[this->a];
         auto v_data = v.data;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto w = *(this->data->data + i);
+            w = *(this->data->data + i);
             T sum = 0;
             for (int j = 0; j < this->b; j++) {
                 sum += *(w->data + j) * *(v_data + j);
@@ -632,8 +718,9 @@ public:
     Vector<ctype<U>> operator* (const Vector<U>& v) const {
         if (this->b != v.length) throw DimensionError();
         ctype<U> temp[this->a];
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto w = *(this->data->data + i);
+            w = *(this->data->data + i);
             ctype<U> sum = 0;
             for (int j = 0; j < this->b; j++) {
                 sum += *(w->data + j) * *(v.data + j);
@@ -645,8 +732,9 @@ public:
     }
 
     Matrix<T> operator*= (const T& val) {
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) *= val;
             }
@@ -657,8 +745,9 @@ public:
     template <typename U>
     Matrix<T> operator*= (const U& val) {
         auto c = static_cast<T>(val);
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(v->data + j) *= c;
             }
@@ -669,9 +758,10 @@ public:
     Matrix<T> operator*= (const Matrix<T>& m) {
         if (this->b != m.a) throw DimensionError();
         Vector<T> new_data[this->a]; // m.b is the length of each vector
+        Vector<T>* v;
 
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i); // pointer to basis vector copied, ~%2.5 faster for high dimensional matrices.
+            v = *(this->data->data + i); // pointer to basis vector copied, ~%2.5 faster for high dimensional matrices.
             T temp[m.b];
             for (int j = 0; j < m.b; j++) {
                 T sum = 0;
@@ -695,10 +785,11 @@ public:
 
     template <typename U>
     Matrix<double> operator/ (const U& val) const {
+        Vector<T>* v;
         Vector<double> new_data[this->a];
         for (int i = 0; i < this->a; i++) {
             double temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = static_cast<double>(*(v->data + j)) / val;
             }
@@ -714,11 +805,13 @@ public:
 
     bool operator== (const Matrix<T>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto a = *(this->data->data + i);
-            auto b = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                if (*(a->data + j) != *(b->data + j)) return false;
+                if (*(v->data + j) != *(w->data + j)) return false;
             }
         }
         return true;
@@ -727,11 +820,13 @@ public:
     template <typename U>
     bool operator== (const Matrix<U>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto a = *(this->data->data + i);
-            auto b = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                if (*(a->data + j) != *(b->data + j)) return false;
+                if (*(v->data + j) != *(w->data + j)) return false;
             }
         }
         return true;
@@ -739,11 +834,13 @@ public:
 
     bool operator!= (const Matrix<T>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto a = *(this->data->data + i);
-            auto b = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                if (*(a->data + j) == *(b->data + j)) return false;
+                if (*(v->data + j) == *(w->data + j)) return false;
             }
         }
         return true;
@@ -752,11 +849,13 @@ public:
     template <typename U>
     bool operator!= (const Matrix<U>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
-            auto a = *(this->data->data + i);
-            auto b = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
-                if (*(a->data + j) == *(b->data + j)) return false;
+                if (*(v->data + j) == *(w->data + j)) return false;
             }
         }
         return true;
@@ -766,10 +865,12 @@ public:
     Matrix<bool> operator|| (const Matrix<U>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
         Vector<bool> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             bool temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = *(v->data + j) || *(w->data + j);
             }
@@ -786,10 +887,12 @@ public:
     Matrix<bool> operator&& (const Matrix<U>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
         Vector<bool> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             bool temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = *(v->data + j) && *(w->data + j);
             }
@@ -806,10 +909,12 @@ public:
     Matrix<bool> operator^ (const Matrix<U>& m) const {
         if ((this->a != m.a) or (this->b != m.b)) throw DimensionError();
         Vector<bool> new_data[this->a];
+        Vector<T>* v;
+        Vector<T>* w;
         for (int i = 0; i < this->a; i++) {
             bool temp[this->b];
-            auto v = *(this->data->data + i);
-            auto w = *(m.data->data + i);
+            v = *(this->data->data + i);
+            w = *(m.data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = *(v->data + j) ^ *(w->data + j);
             }
@@ -824,9 +929,10 @@ public:
 
     [[nodiscard]] Matrix<int> toInt() const {
         Vector<int> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             int temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = static_cast<int>(*(v->data + j));
             }
@@ -842,9 +948,10 @@ public:
 
     [[nodiscard]] Matrix<float> toFloat() const {
         Vector<float> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             float temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = static_cast<float>(*(v->data + j));
             }
@@ -860,9 +967,10 @@ public:
 
     [[nodiscard]] Matrix<double> toDouble() const {
         Vector<double> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             double temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = static_cast<double>(*(v->data + j));
             }
@@ -878,9 +986,10 @@ public:
 
     [[nodiscard]] Matrix<bool> toBool() const {
         Vector<bool> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             bool temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = static_cast<bool>(*(v->data + j));
             }
@@ -1015,8 +1124,9 @@ public:
 
         Vector<T> list[this->a];
         T remainder = 0;
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             T temp[this->b];
             *temp = *(v->data) + remainder;
             for (int j = 1; j < this->b; j++) {
@@ -1036,8 +1146,9 @@ public:
     [[nodiscard]] T sum() const {
         if (this->a == 0) return 0;
         T sum = 0;
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 sum += *(v->data + j);
             }
@@ -1052,9 +1163,10 @@ public:
         }
         if (this->a != this->b) throw DimensionError();
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 if (i == j) *(temp + j) = *(v->data + j);
                 else *(temp + j) = 0;
@@ -1075,9 +1187,10 @@ public:
         }
         if (this->a != this->b) throw DimensionError();
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 if (i < j) *(temp + j) = *(v->data + j);
                 else *(temp + j) = 0;
@@ -1098,9 +1211,10 @@ public:
         }
         if (this->a != this->b) throw DimensionError();
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 if (i > j) *(temp + j) = *(v->data + j);
                 else *(temp + j) = 0;
@@ -1122,9 +1236,10 @@ public:
         }
         if (this->a != this->b) throw DimensionError();
         Vector<T> new_data[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
             T temp[this->b];
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 *(temp + j) = f(*(v->data + j));
             }
@@ -1160,8 +1275,9 @@ public:
     [[nodiscard]] int* __pivots() const {
         if (this->a == 0) return nullptr;
         auto plist = new int[this->a];
+        Vector<T>* v;
         for (int i = 0; i < this->a; i++) {
-            auto v = *(this->data->data + i);
+            v = *(this->data->data + i);
             for (int j = 0; j < this->b; j++) {
                 if (*(v->data + j) != 0) {
                     *(plist + i) = j;
@@ -1402,8 +1518,9 @@ public:
             auto control_matrix = the_double * tpose;
 
             double sum_list[control_matrix.a];
+            Vector<double>* v;
             for (int i = 0; i < control_matrix.a; i++) {
-                Vector<double>* v = *(control_matrix.data->data + i);
+                v = *(control_matrix.data->data + i);
                 double sum = 0;
                 for (int j = 0; j < control_matrix.b; j++) {
                     sum += abs(*(v->data + j));
@@ -1681,7 +1798,7 @@ public:
         return results;
     }
 
-    double* eigenvalue(const unsigned int& resolution = 15) const {
+    [[nodiscard]] double* eigenvalue(const unsigned int& resolution = 15) const {
         // This will return a heap allocated array of length this->a
         if (this->a != this->b) throw DimensionError();
         if (resolution == 0) throw RangeError();

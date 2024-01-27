@@ -50,6 +50,44 @@ public:
     }
     */
 
+    Vector<T> copy() const {
+        if (this->length == 0) {
+            Vector<T> result;
+            return result;
+        }
+        T temp[this->length];
+        for (int i = 0; i < this->length; i++) {
+            *(temp + i) = *(this->data + i);
+        }
+        return Vector<T>(this->length, temp);
+    }
+
+    void sort(const bool& reverse = false) {
+        if (this->length == 0) return;
+        T* temp;
+        if (reverse) {
+            for (int i = 0; i < this->length; i++) {
+                for (int j = 0; j < this->length - i - 1; j++) {
+                    if (*(this->data + j) < *(this->data + j + 1)) {
+                        temp = *(this->data + j + 1);
+                        *(this->data + j + 1) = *(this->data + j);
+                        *(this->data + j) = temp;
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < this->length; i++) {
+                for (int j = 0; j < this->length - i - 1; j++) {
+                    if (*(this->data + j) > *(this->data + j + 1)) {
+                        temp = *(this->data + j + 1);
+                        *(this->data + j + 1) = *(this->data + j);
+                        *(this->data + j) = temp;
+                    }
+                }
+            }
+        }
+    }
+
     unsigned int getsize() {
         return this->size;
     }
@@ -204,7 +242,6 @@ public:
     int __pivot(const double& limiter = 0.00001) {
         if (this->length == 0) return 0;
         for (int i = 0; i < this->length; i++) {
-            // This is sus?!?
             if (abs(*(this->data + i)) > limiter) return i;
         }
         return this->length;

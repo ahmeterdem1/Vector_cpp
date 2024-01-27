@@ -19,9 +19,6 @@ to be ~4600 times faster in Vectorgebra/C++ than Vectorgebra/Python3.11. Determi
 is of course calculated via the echelon method. Analytic would never return regardless
 of the language.
 
-Project is coming to a finish, as there have been few functions left from Vectorgebra/Python
-to add. A Vectorgebra/Python-like documentation and tutorial coming soon!
-
 ## File Structure
 
 There are a total of 7 header files. _vectorgebra.h_ is the file that collects all the 
@@ -250,6 +247,47 @@ for that is, it is a compound method. Because of the import loop, i cannot defin
 in any other header. In the future, there will be more functions in this header
 
 Complex conjugation for vectors and matrices are coded here.
+
+Frobenius product, norm and conjugations also exist here. Since conjugations require 
+the complex class to be defined, this file is the only place that they could be used.
+
+Multithreaded functions will be coded here. The first example is matrix multiplication.
+Threaded matrix-matrix and matrix-vector multiplication is essential for performance
+computing. Threaded functions provided here get much much faster as the dimension
+increases. Algorithms used are different from Vectorgebra/Python, but are similar.
+
+Vectorgebra/Python only included threaded matrix multiplication for matrix-matrix
+multiplications. Vector counterpart does not exist there. Here, it well exists.
+Its algorithm is the same for the case that, second matrix is nx1 dimensional
+at Vectorgebra/Python. Rows of the first matrix are grouped by index. Then this
+information is carried onto threads where related dot products are done and
+written to the target memory. The thread count is defined by the log2 of row count.
+
+Matrix-matrix multpilication is very similar to above. Unlike Vectorgebra/Python, 
+both rows of the first matrix and columns of the second matrix are grouped. At
+Python counterpart, only rows of the first matrix were grouped and processed
+in threads. This generated a worse case at square matrices which was slower than
+basic multiplication. Here, the program works much more efficiently by applying 
+grouping to both operands.
+
+Below graphs describe the features of threaded and linear multiplication algorithms
+very well. 
+
+Matrix - Vector multiplication:
+
+![matrix - vector](https://github.com/ahmeterdem1/Vector_cpp/blob/main/mv.png)
+
+Except some statistical anomalies which are probably due to ill conditioned matrices,
+threaded multiplication is much faster at high dimensions. Only square matrices are
+picked, matrices and vectors used for comparison are the same.
+
+Matrix - Matrix multiplication:
+
+![matrix - matrix](https://github.com/ahmeterdem1/Vector_cpp/blob/main/mm.png)
+
+Again, only square matrices are picked. Except for very low dimensional matrices, 
+threaded version is always superior.
+
 
 <br>
 

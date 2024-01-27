@@ -15,7 +15,7 @@
 #define sqrtPI 1.77245385091
 #define sqrt2 1.41421356237
 #define sqrt2PI 2.50662827463
-#define in :    // This is for Pythonic for loops. I don't use it, but you may if you wish.
+//#define in :    // This is for Pythonic for loops. I don't use it, but you may if you wish.
 #define undefined NaN(2) // Global undefined object, like Python-None, there is just one of it.
                          // However, if you want, you can construct as many as you want.
 

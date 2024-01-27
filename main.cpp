@@ -2,6 +2,7 @@
 #include "include/vectorgebra.h"
 #include <chrono>
 #include <functional>
+#include <fstream>
 
 
 double polynomial(double x) {
@@ -11,6 +12,7 @@ double polynomial(double x) {
 
 int main() {
     srand(unsigned(int(time(0))));
+    /*
     int temp[3] = {1 ,2,3};
     int temp2[3] = {3, 4, 5};
     int temp3[3] = {1, 4, -1};
@@ -69,6 +71,8 @@ int main() {
     std::cout << n * m << std::endl; // Memory leak
     std::cout << 0.5 * m << std::endl; // Memory leak
     std::cout << Matrix<float>::randMfloat(3, 3, -2, 2) << std::endl; // Memory leak
+    */
+
 
     /*
     std::chrono::time_point<std::chrono::steady_clock> begin, end;
@@ -78,6 +82,8 @@ int main() {
     std::chrono::duration<double> dur{end - begin};
     std::cout << "Time of multiplication 1000x1000: " << dur.count() << std::endl;
     */
+
+    /*
     std::cout << v << std::endl;
     std::cout << Matrix<int>::identity(3) * v << std::endl;
     std::cout << v.cumsum() << std::endl; // Memory leak
@@ -91,7 +97,7 @@ int main() {
     std::cout << sqrt(5.5, 15) << std::endl;
 
     // cursed loop
-    for (float k in Range<float>(3, 5, 0.1)) {
+    for (float k : Range<float>(3, 5, 0.1)) {
         std::cout << k << std::endl;
     }
 
@@ -173,12 +179,59 @@ int main() {
 
     auto sub = M.submatrix(0, 3, 1, 5);
     std::cout << sub << std::endl;
+    */
+
+    Matrix<double> testmatrix;
+    Matrix<double> testvector;
+    Matrix<double> mul1;
+    Matrix<double> mul2;
+    std::chrono::time_point<std::chrono::steady_clock> begin, end;
+    std::chrono::duration<double> dur;
+
+    double t_val;
+    for (int i = 10; i < 500; i++) {
+        testmatrix = Matrix<double>::randMdouble(i, i, -5, 5);
+        testvector = Matrix<double>::randMdouble(i, i, -5, 5);
+
+        begin = std::chrono::steady_clock::now();
+        mul1 = testmatrix * testvector;
+        end = std::chrono::steady_clock::now();
+        dur = end - begin;
+        std::cout << dur.count() << std::endl;
+
+
+        begin = std::chrono::steady_clock::now();
+        mul2 = matmul(testmatrix, testvector);
+        end = std::chrono::steady_clock::now();
+        dur = end - begin;
+        std::cout << dur.count() << std::endl;
+
+        testvector.clear();
+        testmatrix.clear();
+        mul1.clear();
+        mul2.clear();
+    }
+
+
+    /*
+    auto mat1 = Matrix<double>::randMdouble(5, 5, -5, 5);
+    auto mat2 = Matrix<double>::randMdouble(5, 5, -5, 5);
+    std::cout << mat1 << std::endl << std::endl;
+    std::cout << mat2 << std::endl << std::endl;
+    auto mulmat1 = mat1 * mat2;
+    auto mulmat2 = matmul(mat1, mat2);
+    std::cout << mulmat1 << std::endl << std::endl;
+    std::cout << mulmat2 << std::endl << std::endl;
+
+    //std::cout << mul1 << std::endl;
+    //std::cout << mul2 << std::endl;
 
     // Memory cleaning from left over objects
     // Lines that have "// Memory Leak" at the end
     // have memory leaks that cannot be resolved.
     // Reasons and how to avoid it is explained
     // in the README.md extensively.
+
     delete[] eigs;
     qr[0].clear();
     qr[1].clear();
@@ -193,5 +246,6 @@ int main() {
     v1.clear();
     v2.clear();
     v3.clear();
+    */
     return 0;
 }
