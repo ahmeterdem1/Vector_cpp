@@ -187,7 +187,7 @@ int main() {
     Matrix<double> mul2;
     std::chrono::time_point<std::chrono::steady_clock> begin, end;
     std::chrono::duration<double> dur;
-
+    std::chrono::duration<double, std::micro> d;
     double t_val;
     for (int i = 10; i < 500; i++) {
         testmatrix = Matrix<double>::randMdouble(i, i, -5, 5);
@@ -196,15 +196,15 @@ int main() {
         begin = std::chrono::steady_clock::now();
         mul1 = testmatrix * testvector;
         end = std::chrono::steady_clock::now();
-        dur = end - begin;
-        std::cout << dur.count() << std::endl;
+        d = end - begin;
+        std::cout << d.count() << std::endl;
 
 
         begin = std::chrono::steady_clock::now();
         mul2 = matmul(testmatrix, testvector);
         end = std::chrono::steady_clock::now();
-        dur = end - begin;
-        std::cout << dur.count() << std::endl;
+        d = end - begin;
+        std::cout << d.count() << std::endl;
 
         testvector.clear();
         testmatrix.clear();

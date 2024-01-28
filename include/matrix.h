@@ -102,6 +102,9 @@ public:
             (*(this->data->data + i))->clear();
         }
         this->data->clear();
+        this->a = 0;
+        this->b = 0;
+        this->data = nullptr;
     }
 
     Matrix<T> copy() const {
@@ -1445,7 +1448,7 @@ public:
         if (method == "analytic") {
             Vector<T> v_list[this->a];
             for (int i = 0; i < this->a; i++) {
-                *(v_list + i) = **(this->data->data + i);
+                *(v_list + i) = **(this->data->data + i); // Copy vectors by value, data pointers will be copied too.
             }
             return Vector<T>::determinant(this->a, v_list);
         } else if (method == "echelon") {
@@ -1528,7 +1531,7 @@ public:
                 *(sum_list + i) = sum;
             }
 
-            double maxima = *sum_list;
+            double maxima = *sum_list; // Value at index 0
             for (int i = 1; i < control_matrix.a; i++) {
                 if (*(sum_list + i) > maxima) {
                     maxima = *(sum_list + i);
@@ -1538,12 +1541,26 @@ public:
             auto guess = tpose / maxima;
             auto iden = Matrix<double>::identity(this->a);
             iden *= 2;
+            Matrix<double> temp1;
+            Matrix<double> temp2;
 
             for (int i = 0; i < resolution; i++) {
-                guess = guess * (iden - the_double * guess);
+                temp1 = the_double * guess;
+                temp2 = iden - temp1;
+
+                temp1.clear();
+                temp1 = guess * temp2;
+                temp2.clear();
+                guess.clear(); // (*)
+                guess = temp1;
+                // DO NOT clear temp1, temp1's data's memory address
+                // got copied into guess. Instead, clear "guess" at label (*)
+                // which will hold the will-be previous memory address of guess
+
+                // "guess" will not be cleared at exit, because it will be returned
             }
 
-            // What if i make clear method act like "async"?
+            // What if I make clear method act like "async"?
             // At this point, we can just return the "guess" and
             // Apply deletions in the background. No big deal.
             control_matrix.clear();
@@ -1711,10 +1728,12 @@ public:
         if (this->a != v.length or this->a == 0) throw DimensionError();
 
         auto tpose = this->transpose();
-        auto temp = (tpose * *this).inverse(method, resolution, lowlimit, highlimit);
+        auto mul = (tpose * *this);
+        auto temp = mul.inverse(method, resolution, lowlimit, highlimit);
         auto result = temp * (tpose * v);
         temp.clear();
         tpose.clear();
+        mul.clear();
         return result;
     }
 
@@ -1724,6 +1743,7 @@ public:
         Vector<double> vlist[this->b];
         auto the_double = this->toDouble();
         auto tpose = the_double.transpose();
+        Vector<double> tempv;
 
         for (int i = 0; i < this->b; i++) {
             *(vlist + i) = **(tpose.data->data + i); // Direct copy of the columns of the self
@@ -1733,9 +1753,15 @@ public:
         *vlist = vlist->unit();
         for (int i = 1; i < this->b; i++) {
             for (int j = 0; j < i; j++) {
-                *(vlist + i) -= (vlist + i)->proj(*(vlist + j));
+                // Procedural coding
+                tempv = (vlist + i)->proj(*(vlist + j));
+                *(vlist + i) -= tempv;
+                tempv.clear();
             }
-            *(vlist + i) = (vlist + i)->unit();
+            tempv = (vlist + i)->unit();
+            (vlist + i)->clear();
+            *(vlist + i) = tempv.copy();
+            tempv.clear();
         }
 
         for (int i = 0; i < this->b; i++) {

@@ -235,6 +235,7 @@ public:
             delete[] this->data;
             this->data = nullptr;
             this->length = 0;
+            this->size = 0;
         }
         return *this;
     }
@@ -748,6 +749,7 @@ public:
     }
 
     Vector<double> unit() {
+        if (this->length == 0) throw DimensionError();
         double sum = 0;
         for (int i = 0; i < this->length; i++) {
             sum += pow(*(this->data + i), 2);
@@ -772,6 +774,7 @@ public:
 
     template <typename U>
     Vector<double> proj(const Vector<U>& v) {
+        if (this->length == 0 or v.length == 0) throw DimensionError();
         if (this->length != v.length) throw DimensionError();
 
         double temp[this->length];
