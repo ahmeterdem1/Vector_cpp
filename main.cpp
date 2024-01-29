@@ -189,7 +189,7 @@ int main() {
     std::chrono::duration<double> dur;
     std::chrono::duration<double, std::micro> d;
     double t_val;
-    for (int i = 10; i < 500; i++) {
+    for (int i = 500; i < 500; i++) {
         testmatrix = Matrix<double>::randMdouble(i, i, -5, 5);
         testvector = Matrix<double>::randMdouble(i, i, -5, 5);
 
@@ -212,6 +212,17 @@ int main() {
         mul2.clear();
     }
 
+    auto f = [] (double x) -> double {
+        //return (3*pow(x, 3) - 8 * pow(x, 2) + 1.72 * x - 10);
+        return cos(10*x, 15);
+    };
+
+    auto solutions = solve(f, -50, 50, 0.1, 0.01);
+    std::cout << *solutions << std::endl;
+
+    for (int i = 0; i < solutions->length; i++) {
+        std::cout << f((*solutions)[i]) << std::endl;
+    }
 
     /*
     auto mat1 = Matrix<double>::randMdouble(5, 5, -5, 5);

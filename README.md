@@ -288,6 +288,23 @@ Matrix - Matrix multiplication:
 Again, only square matrices are picked. Except for very low dimensional matrices, 
 threaded version is always superior.
 
+_solve_ function is algorithmically a little bit different from Python counterpart.
+Firstly, the treatment of resolution parameter is different. A point may be flagged
+when the functions absolute value at said point is lower than square root of the
+resolution. Threads may add the value if the functions absolute value is lower than
+the resolution.
+
+This means that for a precise point to get flagged, you might need to increase 
+resolution. But to get a more precise "x", you need to decrease the resolution.
+
+Threads utilize a global lock. There is no thread id for data collection here. Instead,
+when a thread obtains the lock, it appends to the target vector, then releases the lock.
+
+By idea, this might be slower than collection by thread id. But there is no way to know
+how many zeroes we will find. We need a resizable dynamic data structure, which a
+Vector<double> is. Using a hashmap is always a possible choice. But I believe that it
+will be slower than just appending to a smart array. The only time loss here is that
+you have to add procedurally.
 
 <br>
 
