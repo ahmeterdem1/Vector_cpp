@@ -212,17 +212,21 @@ int main() {
         mul2.clear();
     }
 
-    auto f = [] (double x) -> double {
-        //return (3*pow(x, 3) - 8 * pow(x, 2) + 1.72 * x - 10);
-        return cos(10*x, 15);
-    };
 
-    auto solutions = solve(f, -50, 50, 0.1, 0.01);
-    std::cout << *solutions << std::endl;
+    Graph<int> g;
+    //g.directed = true;
+    g.addVertex("a");
+    g.addVertex("b");
+    g.addEdge("a", "a");
+    g.addEdge("b", "b");
+    g.addVertex("c");
+    g.addEdge("a", "c");
+    g.addEdge("b", "a");
+    auto m = g.generateAdjacency();
+    std::cout << m << std::endl << std::endl;
+    m.clear();
+    g.clear();
 
-    for (int i = 0; i < solutions->length; i++) {
-        std::cout << f((*solutions)[i]) << std::endl;
-    }
 
     /*
     auto mat1 = Matrix<double>::randMdouble(5, 5, -5, 5);

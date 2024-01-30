@@ -21,7 +21,7 @@ of the language.
 
 ## File Structure
 
-There are a total of 7 header files. _vectorgebra.h_ is the file that collects all the 
+There are a total of 9 header files. _vectorgebra.h_ is the file that collects all the 
 others. It also has function definitions for compound functions. Compound functions are
 functions that require multiple objects/functions/etc from multiple header files that are
 chained together. Those definitions cannot be done in any other header file; as this creates
@@ -29,11 +29,12 @@ an import loop, which prevents all the code below the _include_ statement from w
 
 5 of the other 6 header files are chained together. The chain is:
 
-`exceptions.h -> helpers.h -> functions.h -> vector.h -> matrix.h`
+`exceptions.h -> helpers.h -> functions.h -> vector.h -> matrix.h -> graph.h`
 
-_matrix.h_ is then included from _vectorgebra.h_. _compelx.h_ is only connected to the
+_graph.h_ is then included from _vectorgebra.h_. _compelx.h_ is only connected to the
 main vectorgebra header. It still can be used with objects from the header chain. You
-can, for example, create complex valued vectors and matrices.
+can, for example, create complex valued vectors and matrices. _node.h_ is included from
+_graph.h_.
 
 Each files content will be explained in order.
 
@@ -231,6 +232,22 @@ to a heap allocated array, that holds the pivots indexes for each row in the
 matrix, in order.
 
 <br>
+
+## Graphs
+
+Graphs are a complicated data structure that directly simulate a graph structure in
+the RAM with linked nodes. Each node, vertex, contains a linked list of all vertices.
+This list also contains the host node itself. There is no disconnected node. Disconnections
+are declared via 0-weight connections. This is the same practice from the Python counterpart.
+
+Each node also has a weight list that corresponds to the connection list by order. This is
+again the same practice from the Python version. However, unlike Vectorgebra/Python, 
+a Graph object does not hold its adjacency matrix. It is generated when requested.
+
+Both directed and undirected graphs are supported.
+
+Graphs are still incomplete. Due to their complicated structure, their development will
+probably take longer than the others. However, you can find a demo in the main.cpp.
 
 ## Complex Numbers
 

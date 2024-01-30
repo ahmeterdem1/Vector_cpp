@@ -1,7 +1,7 @@
 #ifndef VECTOR_CPP_VECTORGEBRA_H
 #define VECTOR_CPP_VECTORGEBRA_H
 
-#include "matrix.h"
+#include "graph.h"
 #include "./complex.h"
 #include <thread>
 

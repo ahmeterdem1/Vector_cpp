@@ -728,6 +728,33 @@ public:
         return sum;
     }
 
+    void shift(unsigned int amount, const bool& direction = true) {
+        amount %= this->length;
+        if (amount == 0) return;
+        auto target = new T[this->size];
+        unsigned int i;
+        if (direction) {
+            for (i = 0; i < this->length; i++) {
+                *(target + (i + amount)%this->length) = *(this->data + i);
+            }
+        } else {
+            for (i = 0; i < this->length; i++) {
+                *(target + (i + this->length - amount)%this->length) = *(this->data + i);
+            }
+        }
+
+        delete[] this->data;
+        this->data = target;
+    }
+
+    void swap(const unsigned int& first, const unsigned int& second) {
+        if (first >= this->length or first < 0 or second >= this->length or second < 0) throw RangeError();
+
+        T temp = *(this->data + first);
+        *(this->data + first) = *(this->data + second);
+        *(this->data + second) = temp;
+    }
+
     static Vector<T> zero(const unsigned int& dim) {
         if (dim < 0) throw RangeError();
         T temp[dim];

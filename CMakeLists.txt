@@ -10,4 +10,6 @@ add_executable(Vector_cpp main.cpp
         include/functions.h
         include/helpers.h
         include/matrix.h
-        include/complex.h)
+        include/complex.h
+        include/node.h
+        include/graph.h)
