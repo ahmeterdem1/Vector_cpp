@@ -59,6 +59,7 @@ public:
     T first = 0;
     T last = 0;
 
+    // I am leaving the definition of this class here.
     class Iterator {
         T* current = nullptr;
         T step = 1;
@@ -83,191 +84,86 @@ public:
         }
     };
 
-    Range() = default;
+    Range();
 
-    explicit Range(const T& _last) {
-        this->last = _last;
-    }
+    explicit Range(const T& _last);
 
-    Range(const T& _first, const T& _last) {
-        if (_first > _last) throw RangeError();
-        this->first = _first;
-        this->last = _last;
-    }
+    Range(const T& _first, const T& _last);
 
-    Range(const T& _first, const T& _last, const T& _step) {
-        if (_first > _last) throw RangeError();
-        this->first = _first;
-        this->last = _last;
-        this->step = _step;
-    }
+    Range(const T& _first, const T& _last, const T& _step);
 
-    Iterator begin() {
-        return Iterator(&(this->first), this->step);
-    }
+    Iterator begin();
 
-    Iterator end() {
-        return Iterator(&(this->last), this->step);
-    }
+    Iterator end();
 };
 
 class NaN {
 public:
     unsigned int state = 1;
 
-    NaN() = default;
+    NaN();
 
-    explicit NaN (const unsigned int& s) {
-        if (s == 0) this->state = 0;
-        else if (s == 1) this->state = 1;
-        else this->state = 2;
-    }
+    explicit NaN (const unsigned int& s);
 
-    friend std::ostream& operator<< (std::ostream& o, const NaN& n) {
-        if (n.state == 0) o << "Infinity(-)";
-        else if (n.state == 1) o << "Infinity(+)";
-        else o << "Undefined";
-        return o;
-    }
+    friend std::ostream& operator<< (std::ostream& o, const NaN& n);
 
-    NaN operator+ (const NaN& n) const {
-        if (this->state == 2 or n.state == 2) return undefined;
-        if (this->state ^ n.state) return undefined;
-        return NaN(this->state);
-    }
+    NaN operator+ (const NaN& n) const;
 
     template <typename T>
-    NaN operator+ (const T& anything) const {
-        return NaN(this->state);
-    }
+    NaN operator+ (const T& anything) const;
 
     template <typename T>
-    friend NaN operator+ (const T& anything, const NaN& n) {
-        return NaN(n.state);
-    }
+    friend NaN operator+ (const T& anything, const NaN& n);
 
-    NaN operator- (const NaN& n) const {
-        if (this->state == 2 or n.state == 2) return undefined;
-        if (!(this->state ^ n.state)) return undefined;
-        return NaN(this->state);
-    }
+    NaN operator- (const NaN& n) const;
 
     template <typename T>
-    NaN operator- (const T& anything) const {
-        return NaN(this->state);
-    }
+    NaN operator- (const T& anything) const;
 
     template <typename T>
-    friend NaN operator- (const T& anything, const NaN& n) {
-        if (n.state == 2) return undefined;
-        if (n.state == 1) return NaN(0);
-        return NaN(1);
-    }
+    friend NaN operator- (const T& anything, const NaN& n);
 
-    NaN operator* (const NaN& n) const {
-        if (this->state == 2 or n.state == 2) return undefined;
-        return NaN(this->state and n.state);
-    }
+    NaN operator* (const NaN& n) const;
 
     template <typename T>
-    NaN operator* (const T& anything) const {
-        if (this->state == 2) return undefined;
-        if (anything > 0) return NaN(this->state);
-        if (anything < 0) {
-            if (this->state == 1) return NaN(0);
-            return NaN(1);
-        }
-        if (anything == 0) return undefined;
-    }
+    NaN operator* (const T& anything) const;
 
     template <typename T>
-    friend NaN operator* (const T& anything, const NaN& n) {
-        if (n.state == 2) return undefined;
-        if (anything > 0) return NaN(n.state);
-        if (anything < 0) {
-            if (n.state == 1) return NaN(0);
-            return NaN(1);
-        }
-        if (anything == 0) return undefined;
-    }
+    friend NaN operator* (const T& anything, const NaN& n);
 
-    NaN operator/ (const NaN& n) const {
-        return undefined;
-    }
+    NaN operator/ (const NaN& n) const;
 
     template <typename T>
-    NaN operator/ (const T& anything) const {
-        if (this->state == 2) return undefined;
-        if (anything > 0) return NaN(this->state);
-        if (anything < 0) {
-            if (this->state == 1) return NaN(0);
-            return NaN(1);
-        }
-        if (anything == 0) return undefined;
-    }
+    NaN operator/ (const T& anything) const;
 
     template <typename T>
-    friend NaN operator/ (const T& anything, const NaN& n) {
-        return undefined;
-    }
+    friend NaN operator/ (const T& anything, const NaN& n);
 
     template <typename T>
-    NaN operator== (const T& anything) const {
-        return undefined;
-    }
+    NaN operator== (const T& anything) const;
 
     template <typename T>
-    NaN operator!= (const T& anything) const {
-        return undefined;
-    }
+    NaN operator!= (const T& anything) const;
 
-    bool operator> (const NaN& n) const {
-        if (this->state == 2 or n.state == 2 or !(this->state ^ n.state)) return false;
-        if (this->state) return true;
-        return false;
-    }
+    bool operator> (const NaN& n) const;
 
     template <typename T>
-    bool operator> (const T& anything) const {
-        if (this->state == 2 or this->state == 0) return false;
-        return true;
-    }
+    bool operator> (const T& anything) const;
 
-    bool operator>= (const NaN& n) const {
-        if (this->state == 2 or n.state == 2 or !(this->state ^ n.state)) return false;
-        if (this->state) return true;
-        return false;
-    }
+    bool operator>= (const NaN& n) const;
 
     template <typename T>
-    bool operator>= (const T& anything) const {
-        if (this->state == 2 or this->state == 0) return false;
-        return true;
-    }
+    bool operator>= (const T& anything) const;
 
-    bool operator< (const NaN& n) const {
-        if (this->state == 2 or n.state == 2 or !(this->state ^ n.state)) return false;
-        if (this->state) return false;
-        return true;
-    }
+    bool operator< (const NaN& n) const;
 
     template <typename T>
-    bool operator< (const T& anything) const {
-        if (this->state == 2 or this->state == 0) return true;
-        return false;
-    }
+    bool operator< (const T& anything) const;
 
-    bool operator<= (const NaN& n) const {
-        if (this->state == 2 or n.state == 2 or !(this->state ^ n.state)) return false;
-        if (this->state) return false;
-        return true;
-    }
+    bool operator<= (const NaN& n) const;
 
     template <typename T>
-    bool operator<= (const T& anything) const {
-        if (this->state == 2 or this->state == 0) return true;
-        return false;
-    }
+    bool operator<= (const T& anything) const;
 };
 
 NaN Infinity(const bool& sign = true) {
@@ -285,86 +181,27 @@ class Logger {
     std::string format = "%-24s %-12s %-12s %s";
 
 public:
-    explicit Logger(const std::string& alias) {
-        this->name = alias;
-    }
+    explicit Logger(const std::string& alias);
 
-    void setLevel(const unsigned int& level_in) {
-        this->level = level_in % 5;
-    }
+    void setLevel(const unsigned int& level_in);
 
-    void setFormat(const std::string& f) {
-        this->format = f;
-    }
+    void setFormat(const std::string& f);
 
-    [[nodiscard]] unsigned int getLevel() const {
-        return this->level;
-    }
+    [[nodiscard]] unsigned int getLevel() const;
 
-    [[nodiscard]] std::string getName() const {
-        return this->name;
-    }
+    [[nodiscard]] std::string getName() const;
 
-    [[nodiscard]] std::string getFormat() const {
-        return this->format;
-    }
+    [[nodiscard]] std::string getFormat() const;
 
-    void debug(const std::string& message) const {
-        if (this->level <= DEBUG) {
-            // The time formatter in this class is from stack overflow:
-            // https://stackoverflow.com/questions/997946/how-to-get-current-time-and-date-in-c
-            time_t     now = time(0);
-            struct tm  tstruct;
-            char       buf[80];
-            tstruct = *localtime(&now);
-            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-            printf((BLUE + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "DEBUG", message.c_str());
-        }
-    }
+    void debug(const std::string& message) const;
 
-    void info(const std::string& message) const {
-        if (this->level <= INFO) {
-            time_t     now = time(0);
-            struct tm  tstruct;
-            char       buf[80];
-            tstruct = *localtime(&now);
-            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-            printf((GREEN + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "INFO", message.c_str());
-        }
-    }
+    void info(const std::string& message) const;
 
-    void warning(const std::string& message) const {
-        if (this->level <= WARNING) {
-            time_t     now = time(0);
-            struct tm  tstruct;
-            char       buf[80];
-            tstruct = *localtime(&now);
-            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-            printf((YELLOW + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "WARNING", message.c_str());
-        }
-    }
+    void warning(const std::string& message) const;
 
-    void critical(const std::string& message) const {
-        if (this->level <= CRITICAL) {
-            time_t     now = time(0);
-            struct tm  tstruct;
-            char       buf[80];
-            tstruct = *localtime(&now);
-            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-            printf((RED + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "CRITICAL", message.c_str());
-        }
-    }
+    void critical(const std::string& message) const;
 
-    void fatal(const std::string& message) const {
-        if (this->level <= FATAL) {  // Which is always true in our case
-            time_t     now = time(0);
-            struct tm  tstruct;
-            char       buf[80];
-            tstruct = *localtime(&now);
-            strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-            printf((RED + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "FATAL", message.c_str());
-        }
-    }
+    void fatal(const std::string& message) const;
 };
 
 #endif //VECTOR_CPP_HELPERS_H

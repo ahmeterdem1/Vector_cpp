@@ -873,7 +873,7 @@ Vector<double>* solve(std::function<double(double)> f, double low = -50, double 
     bool last_sign = (f(low) >= 0);
     double value;
     double resf = sqrt(resolution, 15); // Effective resolution
-    // We flag the interval
+
 
     // I have to use custom range objects here
     for (auto x : Range<double>(low, high, search_step)) {
@@ -881,7 +881,7 @@ Vector<double>* solve(std::function<double(double)> f, double low = -50, double 
         temp_sign = (value >= 0);
 
         // If prev and incident signs are the same, no crossing occurred.
-        // But the |value| is very close to
+        // But the |value| may be very close to 0, which may indicate a zero (like at x=0 for x^2)
         if (!(temp_sign ^ last_sign) and (abs(value) < resf)) {
             auto t = new std::thread(__find, f, threadlock, x - search_step, x, search_step / 10, resolution, zeroes);
             tlist.append(t);
@@ -1094,7 +1094,7 @@ double norm(const Matrix<T>& m) {
 }
 
 template <typename T, typename U>
-complex<double> frobeniousProduct(const Matrix<complex<T>>& m, const Matrix<complex<U>>& n) {
+complex<double> frobeniusProduct(const Matrix<complex<T>>& m, const Matrix<complex<U>>& n) {
     if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
     if ((m.a == 0) or (n.a == 0)) throw RangeError();
     complex<double> sum;
@@ -1109,7 +1109,7 @@ complex<double> frobeniousProduct(const Matrix<complex<T>>& m, const Matrix<comp
 }
 
 template <typename T, typename U>
-complex<double> frobeniousProduct(const Matrix<T>& m, const Matrix<complex<U>>& n) {
+complex<double> frobeniusProduct(const Matrix<T>& m, const Matrix<complex<U>>& n) {
     if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
     if ((m.a == 0) or (n.a == 0)) throw RangeError();
     complex<double> sum;
@@ -1124,7 +1124,7 @@ complex<double> frobeniousProduct(const Matrix<T>& m, const Matrix<complex<U>>& 
 }
 
 template <typename T, typename U>
-double frobeniousProduct(const Matrix<T>& m, const Matrix<U>& n) {
+double frobeniusProduct(const Matrix<T>& m, const Matrix<U>& n) {
     if ((m.a != n.a) or (m.b != n.b)) throw DimensionError();
     if ((m.a == 0) or (n.a == 0)) throw RangeError();
     double sum = 0;

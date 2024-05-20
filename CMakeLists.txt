@@ -12,4 +12,11 @@ add_executable(Vector_cpp main.cpp
         include/matrix.h
         include/complex.h
         include/node.h
-        include/graph.h)
+        include/graph.h
+        src/exceptions.cpp
+        src/helpers.cpp
+        src/vector.cpp
+        src/node.cpp
+        src/complex.cpp
+        src/graph.cpp
+        src/matrix.cpp)

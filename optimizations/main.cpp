@@ -197,19 +197,22 @@ int main() {
         mul1 = testmatrix * testvector;
         end = std::chrono::steady_clock::now();
         dur = end - begin;
-        std::cout << dur.count() << std::endl;
+        auto dur_s = std::chrono::duration_cast<std::chrono::microseconds>(dur);
+        std::cout << dur_s.count() << std::endl;
 
 
         begin = std::chrono::steady_clock::now();
         mul2 = matmul(testmatrix, testvector);
         end = std::chrono::steady_clock::now();
         dur = end - begin;
-        std::cout << dur.count() << std::endl;
+        dur_s = std::chrono::duration_cast<std::chrono::microseconds>(dur);
+        std::cout << dur_s.count() << std::endl;
 
         testvector.clear();
         testmatrix.clear();
         mul1.clear();
         mul2.clear();
+
     }
 
 

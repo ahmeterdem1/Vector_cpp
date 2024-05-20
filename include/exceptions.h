@@ -9,47 +9,37 @@
 
 class IndexError : public std::exception {
 public:
-    IndexError() = default;
+    IndexError();
 
-    const char* what() {
-        return "IndexError: Incorrect indexing";
-    }
+    const char* what();
 };
 
 class DimensionError : public std::exception {
 public:
-    DimensionError() = default;
+    DimensionError();
 
-    const char* what() {
-        return "DimensionError: Incorrect dimensions for the operation";
-    }
+    const char* what();
 };
 
 class ZeroDivisionError : public std::exception {
 public:
-    ZeroDivisionError() = default;
+    ZeroDivisionError();
 
-    const char* what() {
-        return "ZeroDivisionError: Division by 0";
-    }
+    const char* what();
 };
 
 class RangeError : public std::exception {
 public:
-    RangeError() = default;
+    RangeError();
 
-    const char* what() {
-        return "RangeError: Argument(s) out of range";
-    }
+    const char* what();
 };
 
 class ArgumentError : public std::exception {
 public:
-    ArgumentError() = default;
+    ArgumentError();
 
-    const char* what() {
-        return "ArgumentError: Faulty configuration of argument(s)";
-    }
+    const char* what();
 };
 
 #endif //VECTOR_CPP_EXCEPTIONS_H

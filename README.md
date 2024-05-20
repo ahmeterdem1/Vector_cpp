@@ -36,6 +36,8 @@ main vectorgebra header. It still can be used with objects from the header chain
 can, for example, create complex valued vectors and matrices. _node.h_ is included from
 _graph.h_.
 
+_File structure has been changed to include src files._
+
 Each files content will be explained in order.
 
 <br>
