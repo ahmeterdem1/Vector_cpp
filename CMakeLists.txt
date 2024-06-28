@@ -19,4 +19,6 @@ add_executable(Vector_cpp main.cpp
         src/node.cpp
         src/complex.cpp
         src/graph.cpp
-        src/matrix.cpp)
+        src/matrix.cpp
+        src/vectorgebra.cpp
+        src/functions.cpp)

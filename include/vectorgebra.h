@@ -1,7 +1,7 @@
 #ifndef VECTOR_CPP_VECTORGEBRA_H
 #define VECTOR_CPP_VECTORGEBRA_H
 
-#include "graph.h"
+#include "./graph.h"
 #include "./complex.h"
 #include <thread>
 
@@ -1138,6 +1138,7 @@ double frobeniusProduct(const Matrix<T>& m, const Matrix<U>& n) {
     return sum;
 }
 
+/*
 typedef Vector<int> iVector;
 typedef Vector<float> fVector;
 typedef Vector<double> dVector;
@@ -1158,5 +1159,7 @@ typedef complex<double> dcomplex;
 typedef complex<bool> bcomplex;
 typedef complex<long> lcompelx;
 typedef complex<short> scomplex;
+
+ */
 
 #endif //VECTOR_CPP_VECTORGEBRA_H
