@@ -9,6 +9,7 @@ Graph<T>::Graph() {
     this->vertices = new nodelist<gnode<T>*>;
 }
 
+/*
 template <typename T>
 std::ostream& operator<< (std::ostream& o, const Graph<T>& g) {
     if (g.vertices->length == 0) {
@@ -25,6 +26,7 @@ std::ostream& operator<< (std::ostream& o, const Graph<T>& g) {
         temp = temp->next;
     }
 }
+*/
 
 template <typename T>
 void Graph<T>::addVertex(const std::string& given_label) {

@@ -16,6 +16,7 @@ complex<T>::complex(const T& real, const T& imag) {
     this->imaginary = imag;
 }
 
+/*
 template <typename T>
 std::ostream& operator<< (std::ostream& o, const complex<T>& c) {
     if (c.imaginary >= 0) {
@@ -25,16 +26,19 @@ std::ostream& operator<< (std::ostream& o, const complex<T>& c) {
     o << c.real << " - " << -c.imaginary << "i";
     return o;
 }
+*/
 
 template <typename T>
 complex<T> complex<T>::operator+ (const T& val) const {
     return complex<T>(this->real + val, this->imaginary);
 }
 
+/*
 template <typename T>
 complex<T> operator+ (const T& val, const complex<T>& c) {
     return complex<T>(c.real + val, c.imaginary);
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -43,21 +47,25 @@ complex<typename complex<T>::template ctype<U>> complex<T>::operator+ (const U& 
                              + static_cast<ctype<U>>(val), static_cast<ctype<U>>(this->imaginary));
 }
 
+/*
 template <typename T, typename U>
 complex<typename complex<T>::template ctype<U>> operator+ (const U& val,const complex<T>& c){
     return complex<typename complex<T>::template ctype<U>>(static_cast<typename complex<T>::template ctype<U>>(c.real)
                              + static_cast<typename complex<T>::template ctype<U>>(val), static_cast<typename complex<T>::template ctype<U>>(c.imaginary));
 }
+*/
 
 template <typename T>
 complex<T> complex<T>::operator+ (const complex<T>& c) const {
     return complex<T>(this->real + c.real, this->imaginary + c.imaginary);
 }
 
+/*
 template <typename T>
 complex<T> operator+ (const complex<T>& c, const complex<T>& d) {
     return complex<T>(d.real + c.real, d.imaginary + c.imaginary);
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -106,10 +114,12 @@ complex<T> complex<T>::operator- (const T& val) const {
     return complex<T>(this->real - val, this->imaginary);
 }
 
+/*
 template <typename T>
 complex<T> operator- (const T& val, const complex<T>& c) {
     return complex<T>(val - c.real, -c.imaginary);
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -118,11 +128,13 @@ complex<typename complex<T>::template ctype<U>> complex<T>::operator- (const U& 
             static_cast<ctype<U>>(this->imaginary));
 }
 
+/*
 template <typename T, typename U>
 complex<typename complex<T>::template ctype<U>> operator- (const U& val, const complex<T>& c) {
     return complex<typename complex<T>::template ctype<U>>(static_cast<typename complex<T>::template ctype<U>>(val) - static_cast<typename complex<T>::template ctype<U>>(c.real),
             -static_cast<typename complex<T>::template ctype<U>>(c.imaginary));
 }
+*/
 
 template <typename T>
 complex<T> complex<T>::operator- (const complex<T>& c) const {
@@ -171,10 +183,12 @@ complex<T> complex<T>::operator* (const T& val) const {
     return complex<T>(this->real * val, this->imaginary * val);
 }
 
+/*
 template <typename T>
 complex<T> operator* (const T& val, const complex<T>& c) {
     return complex<T>(val * c.real, val * c.imaginary);
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -183,11 +197,13 @@ complex<typename complex<T>::template ctype<U>> complex<T>::operator* (const U& 
             static_cast<ctype<U>>(this->imaginary) * static_cast<ctype<U>>(val));
 }
 
+/*
 template <typename T, typename U>
 complex<typename complex<T>::template ctype<U>> operator* (const U& val, const complex<T>& c) {
     return complex<typename complex<T>::template ctype<U>>(static_cast<typename complex<T>::template ctype<U>>(val) * static_cast<typename complex<T>::template ctype<U>>(c.real),
             static_cast<typename complex<T>::template ctype<U>>(val) * static_cast<typename complex<T>::template ctype<U>>(c.imaginary));
 }
+*/
 
 template <typename T>
 complex<T> complex<T>::operator* (const complex<T>& c) const {
@@ -238,11 +254,13 @@ complex<double> complex<T>::operator/ (const U& val) const {
     return complex<double>(this->real / val, this->imaginary / val);
 }
 
+/*
 template <typename T, typename U>
 complex<double> operator/ (const U& val, const complex<T>& c) {
     auto temp = c.real * c.real - c.imaginary * c.imaginary;
     return complex<double>(val * c.real / temp, - c.imaginary * val / temp);
 }
+*/
 
 template <typename T>
 template <typename U>

@@ -2,10 +2,12 @@
 // Created by AHMET ERDEM on 19.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_MATRIX_H
 #define VECTOR_CPP_MATRIX_H
 
-#include "vector.h"
+#include "./vector.h"
 
 template <typename T>
 class Matrix {
@@ -23,7 +25,24 @@ public:
 
     Matrix<T>(const unsigned int& a, const unsigned int& b, Vector<T>* v_list);
 
-    friend std::ostream& operator<< (std::ostream& o, const Matrix<T>& m);
+    friend std::ostream& operator<< (std::ostream& o, const Matrix<T>& m) {
+        if (m.a == 0) {
+            o << "[]";
+            return o;
+        }
+        int i;
+        Vector<T>* v;
+        for (i = 0; i < m.a; i++) {
+            v = *(m.data->data + i);
+            o << "[";
+            int j;
+            for (j = 0; j < m.b - 1; j++) {
+                o << *(v->data + j) << ", ";
+            }
+            o << *(v->data + j) << "]" << std::endl;
+        }
+        return o;
+    };
 
     void append(const Vector<T>& v);
 
@@ -49,13 +68,47 @@ public:
 
     Matrix<T> operator+ (const T& val) const;
 
-    friend Matrix<T> operator+ (const T& val, const Matrix<T>& m);
+    friend Matrix<T> operator+ (const T& val, const Matrix<T>& m) {
+        Vector<T> new_data[m.a];
+        for (int i = 0; i < m.a; i++) {
+            T temp[m.b];
+            auto v = *(m.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                temp[j] = *(v->data + j) + val;
+            }
+            Vector<T> v_temp(m.b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<T> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    };
 
     template <typename U>
     Matrix<ctype<U>> operator+ (const U& val) const;
 
     template <typename U>
-    friend Matrix<ctype<U>> operator+ (const U& val, const Matrix<T>& m);
+    friend Matrix<ctype<U>> operator+ (const U& val, const Matrix<T>& m) {
+        Vector<ctype<U>> new_data[m.a];
+        auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
+        for (int i = 0; i < m.a; i++) {
+            ctype<U> temp[m.b];
+            v = *(m.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                temp[j] = static_cast<ctype<U>>(*(v->data + j)) + c;
+            }
+            Vector<ctype<U>> v_temp(m.b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<ctype<U>> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    };
 
     Matrix<T> operator+ (const Matrix<T>& m) const;
 
@@ -76,13 +129,48 @@ public:
 
     Matrix<T> operator- (const T& val) const;
 
-    friend Matrix<T> operator- (const T& val, const Matrix<T>& m);
+    friend Matrix<T> operator- (const T& val, const Matrix<T>& m) {
+        Vector<T> new_data[m.a];
+        Vector<T>* v;
+        for (int i = 0; i < m.a; i++) {
+            T temp[m.b];
+            v = *(m.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                temp[j] = val - *(v->data + j);
+            }
+            Vector<T> v_temp(m.b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<T> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    };
 
     template <typename U>
     Matrix<ctype<U>> operator- (const U& val) const;
 
     template <typename U>
-    friend Matrix<ctype<U>> operator- (const U& val, const Matrix<T>& m);
+    friend Matrix<ctype<U>> operator- (const U& val, const Matrix<T>& m) {
+        Vector<ctype<U>> new_data[m.a];
+        auto c = static_cast<ctype<U>>(val);
+        Vector<T>* v;
+        for (int i = 0; i < m.a; i++) {
+            typename Matrix<T>::template ctype<U> temp[m.b];
+            v = *(m.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                temp[j] = c - static_cast<ctype<U>>(*(*v->data + j));
+            }
+            Vector<ctype<U>> v_temp(m.b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<ctype<U>> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    };
 
     Matrix<T> operator- (const Matrix<T>& m) const;
 
@@ -101,13 +189,48 @@ public:
 
     Matrix<T> operator* (const T& val) const;
 
-    friend Matrix<T> operator* (const T& val, const Matrix<T>& m);
+    friend Matrix<T> operator* (const T& val, const Matrix<T>& m) {
+        Vector<T> new_data[m.a];
+        Vector<T>* v;
+        for (int i = 0; i < m.a; i++) {
+            T temp[m.b];
+            v = *(m.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                temp[j] = val * *(v->data + j);
+            }
+            Vector<T> v_temp(m.b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<T> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    };
 
     template <typename U>
     Matrix<ctype<U>> operator* (const U& val) const;
 
     template <typename U>
-    friend Matrix<ctype<U>> operator* (const U& val, const Matrix<T>& m);
+    friend Matrix<ctype<U>> operator* (const U& val, const Matrix<T>& m) {
+        Vector<typename Matrix<T>::template ctype<U>> new_data[m.a];
+        auto c = static_cast<typename Matrix<T>::template ctype<U>>(val);
+        Vector<T>* v;
+        for (int i = 0; i < m.a; i++) {
+            typename Matrix<T>::template ctype<U> temp[m.b];
+            v = *(m.data->data + i);
+            for (int j = 0; j < m.b; j++) {
+                *(temp + j) = c * static_cast<typename Matrix<T>::template ctype<U>>(*(v->data + j));
+            }
+            Vector<typename Matrix<T>::template ctype<U>> v_temp(m.b, temp);
+            *(new_data + i) = v_temp;
+        }
+        Matrix<typename Matrix<T>::template ctype<U>> result(m.a, m.b, new_data);
+        for (int i = 0; i < m.a; i++) {
+            (new_data + i)->clear();
+        }
+        return result;
+    };
 
     Matrix<T> operator* (const Matrix<T>& m) const;
 

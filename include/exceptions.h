@@ -2,6 +2,8 @@
 // Created by AHMET ERDEM on 19.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_EXCEPTIONS_H
 #define VECTOR_CPP_EXCEPTIONS_H
 

@@ -1,10 +1,10 @@
-CXXFLAGS := -Iinclude -std=c++20 -Wall -Werror
+CXXFLAGS := -Iinclude -std=c++20 -Wall -g
 ALL_OBJECTS := bin/main.o bin/vectorgebra.o bin/graph.o bin/matrix.o bin/vector.o bin/complex.o bin/functions.o bin/helpers.o bin/exceptions.o bin/node.o
 
 bin/main: $(ALL_OBJECTS)
 	g++ $(ALL_OBJECTS) $(CXXFLAGS) -o bin/main
 
-bin/node.o: src/node.cpp include/node.h
+bin/node.o: src/node.cpp include/*.h
 	g++ -c src/node.cpp $(CXXFLAGS) -o bin/node.o
 
 bin/exceptions.o: src/exceptions.cpp include/*.h
@@ -31,8 +31,8 @@ bin/graph.o: src/graph.cpp include/*.h
 bin/vectorgebra.o: src/vectorgebra.cpp include/*.h
 	g++ -c src/vectorgebra.cpp $(CXXFLAGS) -o bin/vectorgebra.o
 
-bin/main.o: ./main.cpp include/*.h
-	g++ -c ./main.cpp $(CXXFLAGS) -o bin/main.o
+bin/main.o: src/main.cpp include/*.h
+	g++ -c src/main.cpp $(CXXFLAGS) -o bin/main.o
 
 run: bin/main
 	./bin/main

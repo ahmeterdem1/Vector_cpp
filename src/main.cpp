@@ -1,5 +1,5 @@
 #include <iostream>
-#include "include/vectorgebra.h"
+#include "../include/vectorgebra.h"
 #include <chrono>
 #include <functional>
 #include <fstream>

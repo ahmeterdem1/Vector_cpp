@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef VECTOR_CPP_VECTORGEBRA_H
 #define VECTOR_CPP_VECTORGEBRA_H
 
@@ -5,7 +7,7 @@
 #include "./complex.h"
 #include <thread>
 
-void __muld(Vector<double>** data1, const double* data2, const int id, unsigned int count, unsigned int stop, double* target) {
+inline void __muld(Vector<double>** data1, const double* data2, const int id, unsigned int count, unsigned int stop, double* target) {
     double sum;
     Vector<double>* v;
     auto ptr = data1 + id * count;
@@ -21,7 +23,7 @@ void __muld(Vector<double>** data1, const double* data2, const int id, unsigned 
     }
 }
 
-void __mulf(Vector<float>** data1, const float* data2, const int id, unsigned int count, unsigned int stop, float* target) {
+inline void __mulf(Vector<float>** data1, const float* data2, const int id, unsigned int count, unsigned int stop, float* target) {
     float sum;
     Vector<float>* v;
     auto ptr = data1 + id * count;
@@ -37,7 +39,7 @@ void __mulf(Vector<float>** data1, const float* data2, const int id, unsigned in
     }
 }
 
-void __muli(Vector<int>** data1, const int* data2, const int id, unsigned int count, unsigned int stop, int* target) {
+inline void __muli(Vector<int>** data1, const int* data2, const int id, unsigned int count, unsigned int stop, int* target) {
     int sum;
     Vector<int>* v;
     auto ptr = data1 + id * count;
@@ -53,7 +55,7 @@ void __muli(Vector<int>** data1, const int* data2, const int id, unsigned int co
     }
 }
 
-void __mull(Vector<long>** data1, const long* data2, const int id, unsigned int count, unsigned int stop, long* target) {
+inline void __mull(Vector<long>** data1, const long* data2, const int id, unsigned int count, unsigned int stop, long* target) {
     long sum;
     Vector<long>* v;
     auto ptr = data1 + id * count;
@@ -69,7 +71,7 @@ void __mull(Vector<long>** data1, const long* data2, const int id, unsigned int 
     }
 }
 
-void __muls(Vector<short>** data1, const short* data2, const int id, unsigned int count, unsigned int stop, short* target) {
+inline void __muls(Vector<short>** data1, const short* data2, const int id, unsigned int count, unsigned int stop, short* target) {
     short sum;
     Vector<short>* v;
     auto ptr = data1 + id * count;
@@ -85,7 +87,7 @@ void __muls(Vector<short>** data1, const short* data2, const int id, unsigned in
     }
 }
 
-void __mulb(Vector<bool>** data1, const bool* data2, const int id, unsigned int count, unsigned int stop, bool* target) {
+inline void __mulb(Vector<bool>** data1, const bool* data2, const int id, unsigned int count, unsigned int stop, bool* target) {
     bool sum;
     Vector<bool>* v;
     auto ptr = data1 + id * count;
@@ -101,7 +103,7 @@ void __mulb(Vector<bool>** data1, const bool* data2, const int id, unsigned int 
     }
 }
 
-Vector<double> matmul(const Matrix<double>& m, const Vector<double>& v) {
+inline Vector<double> matmul(const Matrix<double>& m, const Vector<double>& v) {
     if (m.b != v.length) throw DimensionError();
     auto *temp = new double[m.a];
     int t_count = int(floor(log2(m.a))) + 1; // Thread count
@@ -134,7 +136,7 @@ Vector<double> matmul(const Matrix<double>& m, const Vector<double>& v) {
     return result;
 }
 
-Vector<float> matmul(const Matrix<float>& m, const Vector<float>& v) {
+inline Vector<float> matmul(const Matrix<float>& m, const Vector<float>& v) {
     if (m.b != v.length) throw DimensionError();
     auto *temp = new float[m.a];
     int t_count = int(floor(log2(m.a))) + 1; // Thread count
@@ -167,7 +169,7 @@ Vector<float> matmul(const Matrix<float>& m, const Vector<float>& v) {
     return result;
 }
 
-Vector<int> matmul(const Matrix<int>& m, const Vector<int>& v) {
+inline Vector<int> matmul(const Matrix<int>& m, const Vector<int>& v) {
     if (m.b != v.length) throw DimensionError();
     auto *temp = new int[m.a];
     int t_count = int(floor(log2(m.a))) + 1; // Thread count
@@ -200,7 +202,7 @@ Vector<int> matmul(const Matrix<int>& m, const Vector<int>& v) {
     return result;
 }
 
-Vector<long> matmul(const Matrix<long>& m, const Vector<long>& v) {
+inline Vector<long> matmul(const Matrix<long>& m, const Vector<long>& v) {
     if (m.b != v.length) throw DimensionError();
     auto *temp = new long[m.a];
     int t_count = int(floor(log2(m.a))) + 1; // Thread count
@@ -233,7 +235,7 @@ Vector<long> matmul(const Matrix<long>& m, const Vector<long>& v) {
     return result;
 }
 
-Vector<short> matmul(const Matrix<short>& m, const Vector<short>& v) {
+inline Vector<short> matmul(const Matrix<short>& m, const Vector<short>& v) {
     if (m.b != v.length) throw DimensionError();
     auto *temp = new short[m.a];
     int t_count = int(floor(log2(m.a))) + 1; // Thread count
@@ -266,7 +268,7 @@ Vector<short> matmul(const Matrix<short>& m, const Vector<short>& v) {
     return result;
 }
 
-Vector<bool> matmul(const Matrix<bool>& m, const Vector<bool>& v) {
+inline Vector<bool> matmul(const Matrix<bool>& m, const Vector<bool>& v) {
     if (m.b != v.length) throw DimensionError();
     auto *temp = new bool[m.a];
     int t_count = int(floor(log2(m.a))) + 1; // Thread count
@@ -299,7 +301,7 @@ Vector<bool> matmul(const Matrix<bool>& m, const Vector<bool>& v) {
     return result;
 }
 
-void __mulmd(Vector<double>** data1, Vector<double>** data2, const int idx, const int idy,
+inline void __mulmd(Vector<double>** data1, Vector<double>** data2, const int idx, const int idy,
             unsigned int countx, unsigned int county, unsigned int stopx,
             unsigned int stopy, unsigned int rowlength, Vector<double>* target) {
 
@@ -321,7 +323,7 @@ void __mulmd(Vector<double>** data1, Vector<double>** data2, const int idx, cons
     }
 }
 
-void __mulmf(Vector<float>** data1, Vector<float>** data2, const int idx, const int idy,
+inline void __mulmf(Vector<float>** data1, Vector<float>** data2, const int idx, const int idy,
             unsigned int countx, unsigned int county, unsigned int stopx,
             unsigned int stopy, unsigned int rowlength, Vector<float>* target) {
 
@@ -343,7 +345,7 @@ void __mulmf(Vector<float>** data1, Vector<float>** data2, const int idx, const 
     }
 }
 
-void __mulmi(Vector<int>** data1, Vector<int>** data2, const int idx, const int idy,
+inline void __mulmi(Vector<int>** data1, Vector<int>** data2, const int idx, const int idy,
              unsigned int countx, unsigned int county, unsigned int stopx,
              unsigned int stopy, unsigned int rowlength, Vector<int>* target) {
 
@@ -365,7 +367,7 @@ void __mulmi(Vector<int>** data1, Vector<int>** data2, const int idx, const int 
     }
 }
 
-void __mulml(Vector<long>** data1, Vector<long>** data2, const int idx, const int idy,
+inline void __mulml(Vector<long>** data1, Vector<long>** data2, const int idx, const int idy,
              unsigned int countx, unsigned int county, unsigned int stopx,
              unsigned int stopy, unsigned int rowlength, Vector<long>* target) {
 
@@ -387,7 +389,7 @@ void __mulml(Vector<long>** data1, Vector<long>** data2, const int idx, const in
     }
 }
 
-void __mulms(Vector<short>** data1, Vector<short>** data2, const int idx, const int idy,
+inline void __mulms(Vector<short>** data1, Vector<short>** data2, const int idx, const int idy,
              unsigned int countx, unsigned int county, unsigned int stopx,
              unsigned int stopy, unsigned int rowlength, Vector<short>* target) {
 
@@ -409,7 +411,7 @@ void __mulms(Vector<short>** data1, Vector<short>** data2, const int idx, const 
     }
 }
 
-void __mulmb(Vector<bool>** data1, Vector<bool>** data2, const int idx, const int idy,
+inline void __mulmb(Vector<bool>** data1, Vector<bool>** data2, const int idx, const int idy,
              unsigned int countx, unsigned int county, unsigned int stopx,
              unsigned int stopy, unsigned int rowlength, Vector<bool>* target) {
 
@@ -431,7 +433,7 @@ void __mulmb(Vector<bool>** data1, Vector<bool>** data2, const int idx, const in
     }
 }
 
-Matrix<double> matmul(const Matrix<double>& m, const Matrix<double>& n) {
+inline Matrix<double> matmul(const Matrix<double>& m, const Matrix<double>& n) {
     if (m.b != n.a) throw DimensionError();
     auto *new_data = new Vector<double>[m.a]; //rows
     for (int i = 0; i < m.a; i++) {
@@ -489,7 +491,7 @@ Matrix<double> matmul(const Matrix<double>& m, const Matrix<double>& n) {
     return result;
 }
 
-Matrix<float> matmul(const Matrix<float>& m, const Matrix<float>& n) {
+inline Matrix<float> matmul(const Matrix<float>& m, const Matrix<float>& n) {
     if (m.b != n.a) throw DimensionError();
     auto *new_data = new Vector<float>[m.a]; //rows
     for (int i = 0; i < m.a; i++) {
@@ -547,7 +549,7 @@ Matrix<float> matmul(const Matrix<float>& m, const Matrix<float>& n) {
     return result;
 }
 
-Matrix<int> matmul(const Matrix<int>& m, const Matrix<int>& n) {
+inline Matrix<int> matmul(const Matrix<int>& m, const Matrix<int>& n) {
     if (m.b != n.a) throw DimensionError();
     auto *new_data = new Vector<int>[m.a]; //rows
     for (int i = 0; i < m.a; i++) {
@@ -605,7 +607,7 @@ Matrix<int> matmul(const Matrix<int>& m, const Matrix<int>& n) {
     return result;
 }
 
-Matrix<short> matmul(const Matrix<short>& m, const Matrix<short>& n) {
+inline Matrix<short> matmul(const Matrix<short>& m, const Matrix<short>& n) {
     if (m.b != n.a) throw DimensionError();
     auto *new_data = new Vector<short>[m.a]; //rows
     for (int i = 0; i < m.a; i++) {
@@ -663,7 +665,7 @@ Matrix<short> matmul(const Matrix<short>& m, const Matrix<short>& n) {
     return result;
 }
 
-Matrix<long> matmul(const Matrix<long>& m, const Matrix<long>& n) {
+inline Matrix<long> matmul(const Matrix<long>& m, const Matrix<long>& n) {
     if (m.b != n.a) throw DimensionError();
     auto *new_data = new Vector<long>[m.a]; //rows
     for (int i = 0; i < m.a; i++) {
@@ -721,7 +723,7 @@ Matrix<long> matmul(const Matrix<long>& m, const Matrix<long>& n) {
     return result;
 }
 
-Matrix<bool> matmul(const Matrix<bool>& m, const Matrix<bool>& n) {
+inline Matrix<bool> matmul(const Matrix<bool>& m, const Matrix<bool>& n) {
     if (m.b != n.a) throw DimensionError();
     auto *new_data = new Vector<bool>[m.a]; //rows
     for (int i = 0; i < m.a; i++) {
@@ -827,7 +829,7 @@ Matrix<T> reshape(const Matrix<T>& m, const unsigned int& a, const unsigned int&
 
 // Will .append() to the target if found, thread lock is needed
 // We don't need any thread id's since we have mutex and vectors
-void __find(std::function<double(double)> f, std::mutex* lock, double low,
+inline void __find(std::function<double(double)> f, std::mutex* lock, double low,
             double high, double search_step, double resolution, Vector<double>* target) {
 
     bool temp_sign;
@@ -860,7 +862,7 @@ void __find(std::function<double(double)> f, std::mutex* lock, double low,
 // Will return a vector of found zeroes
 // Since the function f will be looped over
 // in a Range<double> loop, it must accept "double" and return "double"
-Vector<double>* solve(std::function<double(double)> f, double low = -50, double high = 50,
+inline Vector<double>* solve(std::function<double(double)> f, double low = -50, double high = 50,
                       double search_step = 0.1, double resolution = 0.01) {
 
     if (high <= low or search_step <= 0 or resolution <= 0 or resolution >= 1) throw RangeError();

@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <ctime>
 
+
 template <typename T>
 Range<T>::Range() = default;
 
@@ -49,12 +50,14 @@ NaN::NaN(const unsigned int &s) {
     else this->state = 2;
 }
 
+/*
 std::ostream& operator<< (std::ostream& o, const NaN& n) {
     if (n.state == 0) o << "Infinity(-)";
     else if (n.state == 1) o << "Infinity(+)";
     else o << "Undefined";
     return o;
 }
+*/
 
 NaN NaN::operator+ (const NaN& n) const {
     if (this->state == 2 or n.state == 2) return undefined;
@@ -67,10 +70,12 @@ NaN NaN::operator+ (const T& anything) const {
     return NaN(this->state);
 }
 
+/*
 template <typename T>
 NaN operator+ (const T& anything, const NaN& n) {
     return NaN(n.state);
 }
+*/
 
 NaN NaN::operator- (const NaN& n) const {
     if (this->state == 2 or n.state == 2) return undefined;
@@ -83,12 +88,14 @@ NaN NaN::operator- (const T& anything) const {
     return NaN(this->state);
 }
 
+/*
 template <typename T>
 NaN operator- (const T& anything, const NaN& n) {
     if (n.state == 2) return undefined;
     if (n.state == 1) return NaN(0);
     return NaN(1);
 }
+*/
 
 NaN NaN::operator* (const NaN& n) const {
     if (this->state == 2 or n.state == 2) return undefined;
@@ -106,6 +113,7 @@ NaN NaN::operator* (const T& anything) const {
     if (anything == 0) return undefined;
 }
 
+/*
 template <typename T>
 NaN operator* (const T& anything, const NaN& n) {
     if (n.state == 2) return undefined;
@@ -116,6 +124,7 @@ NaN operator* (const T& anything, const NaN& n) {
     }
     if (anything == 0) return undefined;
 }
+*/
 
 NaN NaN::operator/ (const NaN& n) const {
     return undefined;
@@ -132,10 +141,12 @@ NaN NaN::operator/ (const T& anything) const {
     if (anything == 0) return undefined;
 }
 
+/*
 template <typename T>
 NaN operator/ (const T& anything, const NaN& n) {
     return undefined;
 }
+*/
 
 template <typename T>
 NaN NaN::operator== (const T& anything) const {
@@ -275,3 +286,5 @@ void Logger::fatal(const std::string& message) const {
         printf((RED + this->format + RESET + "\n").c_str(), buf, this->name.c_str(), "FATAL", message.c_str());
     }
 }
+
+template class Range<double>;

@@ -2,11 +2,13 @@
 // Created by AHMET ERDEM on 19.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_VECTOR_H
 #define VECTOR_CPP_VECTOR_H
 
 #include <type_traits>
-#include "functions.h"
+#include "./functions.h"
 
 template <typename T>
 class Vector {
@@ -34,7 +36,19 @@ public:
 
     T operator[] (int index);
 
-    friend std::ostream& operator<< (std::ostream& o, const Vector& a);
+    friend std::ostream& operator<< (std::ostream& o, const Vector& a) {
+        o << "[";
+        if (a.length == 0) {
+            o << "]";
+            return o;
+        }
+        int i;
+        for (i = 0; i < a.length - 1; i++) {
+            o << *(a.data + i) << ", ";
+        }
+        o << *(a.data + i) << "]";
+        return o;
+    };
 
     void append(const T& inn);
 
@@ -56,11 +70,26 @@ public:
     template <typename U>
     Vector<ctype<U>> operator+ (const U& a) const;
 
-    friend Vector<T> operator+ (const T& a, const Vector<T>& v);
+    friend Vector<T> operator+ (const T& a, const Vector<T>& v) {
+        T temp[v.length];
+        for (int i = 0; i < v.length; i++) {
+            temp[i] = *(v.data + i) + a;
+        }
+        Vector<T> result(v.length, temp);
+        return result;
+    };
 
     // Extraneous some shit
     template <typename U>
-    friend Vector<ctype<U>> operator+ (const U& a, const Vector<T>& v);
+    friend Vector<ctype<U>> operator+ (const U& a, const Vector<T>& v) {
+        ctype<U> temp[v.length];
+        auto val = static_cast<ctype<U>>(a);
+        for (int i = 0; i < v.length; i++) {
+            temp[i] = static_cast<ctype<U>>(*(v.data + i)) + val;
+        }
+        Vector<ctype<U>> result(v.length, temp);
+        return result;
+    };
 
     Vector<T> operator+= (const T& a);
 
@@ -84,10 +113,25 @@ public:
     template <typename U>
     Vector<ctype<U>> operator- (const U& a) const;
 
-    friend Vector<T> operator- (const T& a, const Vector<T>& v);
+    friend Vector<T> operator- (const T& a, const Vector<T>& v) {
+        T temp[v.length];
+        for (int i = 0; i < v.length; i++) {
+            temp[i] = a - *(v.data + i);
+        }
+        Vector<T> result(v.length, temp);
+        return result;
+    };
 
     template <typename U>
-    friend Vector<ctype<U>> operator- (const U& a, const Vector<T>& v);
+    friend Vector<ctype<U>> operator- (const U& a, const Vector<T>& v) {
+        ctype<U> temp[v.length];
+        auto val = static_cast<ctype<U>>(a);
+        for (int i = 0; i < v.length; i++) {
+            temp[i] = val - static_cast<ctype<U>>(*(v.data + i));
+        }
+        Vector<ctype<U>> result(v.length, temp);
+        return result;
+    };
 
     Vector<T> operator-= (const T& a);
 
@@ -106,13 +150,28 @@ public:
     template <typename U>
     ctype<U> operator* (const Vector<U>& v) const;
 
-    friend Vector<T> operator* (const T& a, const Vector<T>& v);
+    friend Vector<T> operator* (const T& a, const Vector<T>& v) {
+        T temp[v.length];
+        for (int i = 0; i < v.length; i++) {
+            temp[i] = *(v.data + i ) * a;
+        }
+        Vector<T> result(v.length, temp);
+        return result;
+    };
 
     template <typename U>
     Vector<ctype<U>> operator* (const U& a) const;
 
     template <typename U>
-    friend Vector<ctype<U>> operator* (const U& a, const Vector<T>& v);
+    friend Vector<ctype<U>> operator* (const U& a, const Vector<T>& v) {
+        ctype<U> temp[v.length];
+        auto val = static_cast<ctype<U>>(a);
+        for (int i = 0; i < v.length; i++) {
+            temp[i] = static_cast<ctype<U>>(*(v.data + i)) * val;
+        }
+        Vector<ctype<U>> result(v.length, temp);
+        return result;
+    };
 
     Vector<T> operator*= (const T& a);
 

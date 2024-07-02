@@ -4,6 +4,7 @@
 
 #include "../include/functions.h"
 #include <type_traits>
+#include <thread>
 #include "../include/vector.h"
 
 template <typename T>
@@ -53,9 +54,9 @@ void Vector<T>::sort(const bool& reverse) {
         for (int i = 0; i < this->length; i++) {
             for (int j = 0; j < this->length - i - 1; j++) {
                 if (*(this->data + j) < *(this->data + j + 1)) {
-                    temp = *(this->data + j + 1);
+                    temp = (this->data + j + 1);
                     *(this->data + j + 1) = *(this->data + j);
-                    *(this->data + j) = temp;
+                    *(this->data + j) = *temp;
                 }
             }
         }
@@ -63,9 +64,9 @@ void Vector<T>::sort(const bool& reverse) {
         for (int i = 0; i < this->length; i++) {
             for (int j = 0; j < this->length - i - 1; j++) {
                 if (*(this->data + j) > *(this->data + j + 1)) {
-                    temp = *(this->data + j + 1);
+                    temp = (this->data + j + 1);
                     *(this->data + j + 1) = *(this->data + j);
-                    *(this->data + j) = temp;
+                    *(this->data + j) = *temp;
                 }
             }
         }
@@ -107,6 +108,7 @@ T Vector<T>::operator[] (int index) {
     return *(this->data + index);
 }
 
+/*
 template <typename T>
 std::ostream& operator<< (std::ostream& o, const Vector<T>& a) {
     o << "[";
@@ -121,6 +123,7 @@ std::ostream& operator<< (std::ostream& o, const Vector<T>& a) {
     o << *(a.data + i) << "]";
     return o;
 }
+*/
 
 template <typename T>
 void Vector<T>::append(const T& inn) {
@@ -290,6 +293,7 @@ Vector<typename Vector<T>::template ctype<U>> Vector<T>::operator+ (const U& a) 
     return result;
 }
 
+/*
 template <typename T>
 Vector<T> operator+ (const T& a, const Vector<T>& v) {
     T temp[v.length];
@@ -299,8 +303,10 @@ Vector<T> operator+ (const T& a, const Vector<T>& v) {
     Vector<T> result(v.length, temp);
     return result;
 }
+*/
 
 //template <typename T>
+/*
 template <typename T, typename U>
 Vector<typename Vector<T>::template ctype<U>> operator+ (const U& a, const Vector<T>& v) {
     typename Vector<T>::template ctype<U> temp[v.length];
@@ -311,6 +317,7 @@ Vector<typename Vector<T>::template ctype<U>> operator+ (const U& a, const Vecto
     Vector<typename Vector<T>::template ctype<U>> result(v.length, temp);
     return result;
 }
+*/
 
 template <typename T>
 Vector<T> Vector<T>::operator+= (const T& a) {
@@ -407,6 +414,7 @@ Vector<typename Vector<T>::template ctype<U>> Vector<T>::operator- (const U& a) 
     return result;
 }
 
+/*
 template <typename T>
 Vector<T> operator- (const T& a, const Vector<T>& v) {
     T temp[v.length];
@@ -416,7 +424,9 @@ Vector<T> operator- (const T& a, const Vector<T>& v) {
     Vector<T> result(v.length, temp);
     return result;
 }
+*/
 
+/*
 template <typename T, typename U>
 Vector<typename Vector<T>::template ctype<U>> operator- (const U& a, const Vector<T>& v) {
     typename Vector<T>::template ctype<U> temp[v.length];
@@ -427,6 +437,7 @@ Vector<typename Vector<T>::template ctype<U>> operator- (const U& a, const Vecto
     Vector<typename Vector<T>::template ctype<U>> result(v.length, temp);
     return result;
 }
+*/
 
 template <typename T>
 Vector<T> Vector<T>::operator-= (const T& a) {
@@ -496,6 +507,7 @@ typename Vector<T>::template ctype<U> Vector<T>::operator* (const Vector<U>& v) 
     return sum;
 }
 
+/*
 template <typename T>
 Vector<T> operator* (const T& a, const Vector<T>& v) {
     T temp[v.length];
@@ -505,6 +517,7 @@ Vector<T> operator* (const T& a, const Vector<T>& v) {
     Vector<T> result(v.length, temp);
     return result;
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -518,6 +531,7 @@ Vector<typename Vector<T>::template ctype<U>> Vector<T>::operator* (const U& a) 
     return result;
 }
 
+/*
 template <typename T, typename U>
 Vector<typename Vector<T>::template ctype<U>> operator* (const U& a, const Vector<T>& v) {
     typename Vector<T>::template ctype<U> temp[v.length];
@@ -528,6 +542,7 @@ Vector<typename Vector<T>::template ctype<U>> operator* (const U& a, const Vecto
     Vector<typename Vector<T>::template ctype<U>> result(v.length, temp);
     return result;
 }
+*/
 
 template <typename T>
 Vector<T> Vector<T>::operator*= (const T& a) {
@@ -1149,3 +1164,72 @@ Vector<T> Vector<T>::filter(std::function<bool(T)> f) {
     Vector<T> result(count, temp); // "count" is the length, not this->length
     return result;
 }
+
+// I have to do this because I do explicit calls to specific templates in vectorgebra.h and elsewhere.
+// To find where, comment all below code and try to compile the library...
+
+template class Vector<double>;
+template class Vector<float>;
+template class Vector<long>;
+template class Vector<int>;
+template class Vector<short>;
+template class Vector<bool>;
+
+template Vector<std::thread*>::Vector();
+template Vector<std::thread*> Vector<std::thread*>::clear();
+template void Vector<std::thread*>::append(std::thread* const&);
+
+template Vector<Vector<bool>*>::Vector();
+template Vector<Vector<bool>*> Vector<Vector<bool>*>::clear();
+template unsigned int Vector<Vector<bool>*>::getsize();
+template Vector<bool>* Vector<Vector<bool>*>::pop(int);
+template void Vector<Vector<bool>*>::insert(int, Vector<bool>*);
+template void Vector<Vector<bool>*>::reverse();
+template void Vector<Vector<bool>*>::resize();
+template void Vector<Vector<bool>*>::append(Vector<bool>* const&);
+
+template Vector<Vector<short>*>::Vector();
+template Vector<Vector<short>*> Vector<Vector<short>*>::clear();
+template unsigned int Vector<Vector<short>*>::getsize();
+template Vector<short>* Vector<Vector<short>*>::pop(int);
+template void Vector<Vector<short>*>::insert(int, Vector<short>*);
+template void Vector<Vector<short>*>::reverse();
+template void Vector<Vector<short>*>::resize();
+template void Vector<Vector<short>*>::append(Vector<short>* const&);
+
+template Vector<Vector<int>*>::Vector();
+template Vector<Vector<int>*> Vector<Vector<int>*>::clear();
+template unsigned int Vector<Vector<int>*>::getsize();
+template Vector<int>* Vector<Vector<int>*>::pop(int);
+template void Vector<Vector<int>*>::insert(int, Vector<int>*);
+template void Vector<Vector<int>*>::reverse();
+template void Vector<Vector<int>*>::resize();
+template void Vector<Vector<int>*>::append(Vector<int>* const&);
+
+template Vector<Vector<long>*>::Vector();
+template Vector<Vector<long>*> Vector<Vector<long>*>::clear();
+template unsigned int Vector<Vector<long>*>::getsize();
+template Vector<long>* Vector<Vector<long>*>::pop(int);
+template void Vector<Vector<long>*>::insert(int, Vector<long>*);
+template void Vector<Vector<long>*>::reverse();
+template void Vector<Vector<long>*>::resize();
+template void Vector<Vector<long>*>::append(Vector<long>* const&);
+
+template Vector<Vector<float>*>::Vector();
+template Vector<Vector<float>*> Vector<Vector<float>*>::clear();
+template unsigned int Vector<Vector<float>*>::getsize();
+template Vector<float>* Vector<Vector<float>*>::pop(int);
+template void Vector<Vector<float>*>::insert(int, Vector<float>*);
+template void Vector<Vector<float>*>::reverse();
+template void Vector<Vector<float>*>::resize();
+template void Vector<Vector<float>*>::append(Vector<float>* const&);
+
+template Vector<Vector<double>*>::Vector();
+template Vector<Vector<double>*> Vector<Vector<double>*>::clear();
+template unsigned int Vector<Vector<double>*>::getsize();
+template Vector<double>* Vector<Vector<double>*>::pop(int);
+template void Vector<Vector<double>*>::insert(int, Vector<double>*);
+template void Vector<Vector<double>*>::reverse();
+template void Vector<Vector<double>*>::resize();
+template void Vector<Vector<double>*>::append(Vector<double>* const&);
+

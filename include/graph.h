@@ -2,6 +2,8 @@
 // Created by AHMET ERDEM on 30.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_GRAPH_H
 #define VECTOR_CPP_GRAPH_H
 #include "./node.h"
@@ -16,7 +18,21 @@ public:
 
     Graph();
 
-    friend std::ostream& operator<< (std::ostream& o, const Graph& g);
+    friend std::ostream& operator<< (std::ostream& o, const Graph& g) {
+        if (g.vertices->length == 0) {
+            o << "[EmptyGraph]" << std::endl;
+            return o;
+        }
+
+        auto temp = g.vertices->head;
+        for (int i = 0; i < g.vertices->length; i++) {
+            o << temp->data->label << ": ";
+            for (int j = 0; j < temp->data->connected->length; j++) {
+
+            }
+            temp = temp->next;
+        }
+    };
 
     void addVertex(const std::string& given_label);
 

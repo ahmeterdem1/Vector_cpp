@@ -16,6 +16,7 @@ Matrix<T>::Matrix(const unsigned int& a, const unsigned int& b, Vector<T>* v_lis
     this->b = b;
 }
 
+/*
 template <typename T>
 std::ostream& operator<< (std::ostream& o, const Matrix<T>& m) {
     if (m.a == 0) {
@@ -35,6 +36,7 @@ std::ostream& operator<< (std::ostream& o, const Matrix<T>& m) {
     }
     return o;
 }
+*/
 
 template <typename T>
 void Matrix<T>::append(const Vector<T>& v) {
@@ -66,16 +68,16 @@ void Matrix<T>::insert(int index, const Vector<T>& v) {
     if (this->b == 0) {
         this->b = v.length;
     }
-    auto to_add = new Vector<T>(v.length, v.data);
+    auto* to_add = new Vector<T>(v.length, v.data);
     if (this->data == nullptr) {
         this->data = new Vector<Vector<T>*>[2];
-        this->data->data = to_add;
+        this->data->data = &to_add;  // data of the first Vector object
         this->a = 1;
         return;
     }
     if (index < 0) index += this->a;
     if (index < 0) {
-        to_add.clear();
+        to_add->clear();
         delete to_add;
         throw IndexError();
     }
@@ -211,6 +213,7 @@ Matrix<T> Matrix<T>::operator+ (const T& val) const {
     return result;
 }
 
+/*
 template <typename T>
 Matrix<T> operator+ (const T& val, const Matrix<T>& m) {
     Vector<T> new_data[m.a];
@@ -229,6 +232,7 @@ Matrix<T> operator+ (const T& val, const Matrix<T>& m) {
     }
     return result;
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -252,6 +256,7 @@ Matrix<typename Matrix<T>::template ctype<U>> Matrix<T>::operator+ (const U& val
     return result;
 }
 
+/*
 template <typename T, typename U>
 Matrix<typename Matrix<T>::template ctype<U>> operator+ (const U& val, const Matrix<T>& m) {
     Vector<typename Matrix<T>::template ctype<U>> new_data[m.a];
@@ -272,6 +277,7 @@ Matrix<typename Matrix<T>::template ctype<U>> operator+ (const U& val, const Mat
     }
     return result;
 }
+*/
 
 template <typename T>
 Matrix<T> Matrix<T>::operator+ (const Matrix<T>& m) const {
@@ -417,6 +423,7 @@ Matrix<T> Matrix<T>::operator- (const T& val) const {
     return result;
 }
 
+/*
 template <typename T>
 Matrix<T> operator- (const T& val, const Matrix<T>& m) {
     Vector<T> new_data[m.a];
@@ -436,6 +443,7 @@ Matrix<T> operator- (const T& val, const Matrix<T>& m) {
     }
     return result;
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -459,6 +467,7 @@ Matrix<typename Matrix<T>::template ctype<U>> Matrix<T>::operator- (const U& val
     return result;
 }
 
+/*
 template <typename T, typename U>
 Matrix<typename Matrix<T>::template ctype<U>> operator- (const U& val, const Matrix<T>& m) {
     Vector<typename Matrix<T>::template ctype<U>> new_data[m.a];
@@ -479,6 +488,7 @@ Matrix<typename Matrix<T>::template ctype<U>> operator- (const U& val, const Mat
     }
     return result;
 }
+*/
 
 template <typename T>
 Matrix<T> Matrix<T>::operator- (const Matrix<T>& m) const {
@@ -604,6 +614,7 @@ Matrix<T> Matrix<T>::operator* (const T& val) const {
     return result;
 }
 
+/*
 template <typename T>
 Matrix<T> operator* (const T& val, const Matrix<T>& m) {
     Vector<T> new_data[m.a];
@@ -623,6 +634,7 @@ Matrix<T> operator* (const T& val, const Matrix<T>& m) {
     }
     return result;
 }
+*/
 
 template <typename T>
 template <typename U>
@@ -646,6 +658,7 @@ Matrix<typename Matrix<T>::template ctype<U>> Matrix<T>::operator* (const U& val
     return result;
 }
 
+/*
 template <typename T, typename U>
 Matrix<typename Matrix<T>::template ctype<U>> operator* (const U& val, const Matrix<T>& m) {
     Vector<typename Matrix<T>::template ctype<U>> new_data[m.a];
@@ -666,6 +679,7 @@ Matrix<typename Matrix<T>::template ctype<U>> operator* (const U& val, const Mat
     }
     return result;
 }
+*/
 
 template <typename T>
 Matrix<T> Matrix<T>::operator* (const Matrix<T>& m) const {
@@ -1382,7 +1396,7 @@ Matrix<double> Matrix<T>::echelon(const double& lowlimit, const double& highlimi
             if (abs(rows_first) < lowlimit) continue;
             factor = rows_first / first;
             if (abs(factor) > highlimit) continue;
-            *w -= factor * *v;
+            *w -= (*v) * factor;
         }
     }
 
@@ -1437,7 +1451,7 @@ Matrix<double> Matrix<T>::rrechelon(const double& lowlimit, const double& highli
             if (abs(rows_first) < lowlimit) continue;
             factor = rows_first / first;
             if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
-            *w -= factor * *v;
+            *w -= *v * factor;
         }
     }
 
@@ -1462,7 +1476,7 @@ Matrix<double> Matrix<T>::rrechelon(const double& lowlimit, const double& highli
             if (abs(rows_first) < lowlimit) continue;
             factor = rows_first / first;
             if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
-            *w -= factor * *v;
+            *w -= *v * factor;
         }
     }
 
@@ -1488,7 +1502,7 @@ Matrix<double> Matrix<T>::rrechelon(const double& lowlimit, const double& highli
             if (abs(rows_first) < lowlimit) continue;
             factor = rows_first / first;
             if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
-            *w -= factor * *v;
+            *w -= *v * factor;
         }
     }
 
@@ -1545,7 +1559,7 @@ double Matrix<T>::determinant(const std::string& method, const double& lowlimit,
                 if (abs(rows_first) < lowlimit) continue;
                 factor = rows_first / first;
                 if (abs(factor) > highlimit) continue;
-                *w -= factor * *v;
+                *w -= *v * factor;
             }
         }
 
@@ -1562,9 +1576,11 @@ double Matrix<T>::determinant(const std::string& method, const double& lowlimit,
 
         auto result = copy_matrix.mulDiagonal();
         copy_matrix.clear();
+
         if (sign) return result;
         return -result;
     }
+    throw ArgumentError();
 }
 
 template <typename T>
@@ -1678,8 +1694,8 @@ Matrix<double> Matrix<T>::inverse(const std::string& method, const unsigned int&
                 if (abs(rows_first) < lowlimit) continue;
                 factor = rows_first / first;
                 if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
-                *w -= factor * *v;
-                *w_i -= factor * *v_i; // Mirror operation
+                *w -= *v * factor;
+                *w_i -= *v_i * factor; // Mirror operation
             }
         }
 
@@ -1708,8 +1724,8 @@ Matrix<double> Matrix<T>::inverse(const std::string& method, const unsigned int&
                 if (abs(rows_first) < lowlimit) continue;
                 factor = rows_first / first;
                 if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
-                *w -= factor * *v;
-                *w_i -= factor * *v_i;
+                *w -= *v * factor;
+                *w_i -= *v_i * factor;
             }
         }
 
@@ -1739,8 +1755,8 @@ Matrix<double> Matrix<T>::inverse(const std::string& method, const unsigned int&
                 if (abs(rows_first) < lowlimit) continue;
                 factor = rows_first / first;
                 if (abs(factor) > highlimit or abs(factor) < lowlimit) continue;
-                *w -= factor * *v;
-                *w_i -= factor * *v_i;
+                *w -= *v * factor;
+                *w_i -= *v_i * factor;
             }
         }
 
@@ -1953,3 +1969,11 @@ Matrix<T> Matrix<T>::submatrix(int a, int b, int c, int d) const {
     }
     return result;
 }
+
+template class Matrix<double>;
+template class Matrix<float>;
+template class Matrix<long>;
+template class Matrix<int>;
+template class Matrix<short>;
+template class Matrix<bool>;
+

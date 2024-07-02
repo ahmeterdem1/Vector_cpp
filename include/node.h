@@ -2,6 +2,8 @@
 // Created by AHMET ERDEM on 30.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_NODE_H
 #define VECTOR_CPP_NODE_H
 #include <string>

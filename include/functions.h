@@ -2,16 +2,19 @@
 // Created by AHMET ERDEM on 19.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_FUNCTIONS_H
 #define VECTOR_CPP_FUNCTIONS_H
 
 #include <functional>
-#include "helpers.h"
+#include "./helpers.h"
+
 
 template <typename T, typename U>
 using fp = std::function<T(U)>;
 
-float randf() {
+inline float randf() {
     float first = rand();
     float second = rand();
     while (second < first) {
@@ -20,7 +23,7 @@ float randf() {
     return first / second;
 }
 
-int randint(const int& a, const int& b) {
+inline int randint(const int& a, const int& b) {
     if (b < a) throw RangeError();
     auto a_f = float(a);
     auto b_f = float(b);
@@ -40,7 +43,7 @@ int randint(const int& a, const int& b) {
     return int(val);
 }
 
-float randfloat(const float& a, const float& b) {
+inline float randfloat(const float& a, const float& b) {
     if (b <= a) throw RangeError();
     if (a < 0) {
         float b_p = b - a;
@@ -57,7 +60,7 @@ float randfloat(const float& a, const float& b) {
     return val;
 }
 
-double randdouble(const double& a, const double& b) {
+inline double randdouble(const double& a, const double& b) {
     if (b <= a) throw RangeError();
     if (a < 0) {
         double b_p = b - a;
@@ -74,19 +77,19 @@ double randdouble(const double& a, const double& b) {
     return val;
 }
 
-bool randbool() {
+inline bool randbool() {
     return (rand() % 2) == 1;
 }
 
 template <typename T>
-void swap(T* a, T* b) { // This will be used in future algorithms
+inline void swap(T* a, T* b) { // This will be used in future algorithms
     T temp = *a;
     *a = *b;
     *b = temp;
 }
 
 template <typename T>
-double sqrt(const T& val, const unsigned int& resolution = 15) {
+inline double sqrt(const T& val, const unsigned int& resolution = 15) {
     if (resolution == 0) throw RangeError();
     double temp = 2;
     for (int i = 0; i < resolution; i++) {
@@ -95,7 +98,7 @@ double sqrt(const T& val, const unsigned int& resolution = 15) {
     return temp;
 }
 
-unsigned int factorial(const unsigned int& x) {
+inline unsigned int factorial(const unsigned int& x) {
     unsigned int factor = 1;
     for (unsigned int i = x; i > 0; i--) {
         factor *= i;
@@ -103,7 +106,7 @@ unsigned int factorial(const unsigned int& x) {
     return factor;
 }
 
-unsigned int permutation(const unsigned int& x, const unsigned int& y) {
+inline unsigned int permutation(const unsigned int& x, const unsigned int& y) {
     if (x < 1 or y < 1 or x < y) throw RangeError();
     unsigned int result = 1;
     for (unsigned int i = y + 1; i < x + 1; i++) {
@@ -112,7 +115,7 @@ unsigned int permutation(const unsigned int& x, const unsigned int& y) {
     return result;
 }
 
-double combination(const unsigned int& x, const unsigned int& y) {
+inline double combination(const unsigned int& x, const unsigned int& y) {
     if (x < 0 or y < 0 or x < y) throw RangeError();
     double result = 1;
     double count = 1;
@@ -123,7 +126,7 @@ double combination(const unsigned int& x, const unsigned int& y) {
     return result;
 }
 
-double multinomial(unsigned int n, const unsigned int& argc, const int *list) {
+inline double multinomial(unsigned int n, const unsigned int& argc, const int *list) {
     int sum = 0;
     int val;
     int copy_list[argc];
@@ -148,18 +151,18 @@ double multinomial(unsigned int n, const unsigned int& argc, const int *list) {
     return result;
 }
 
-double binomial(const unsigned int& n, const unsigned int& k, const double& p) {
+inline double binomial(const unsigned int& n, const unsigned int& k, const double& p) {
     if (p < 0 or p > 1) throw RangeError();
     return combination(n, k) * pow(p, k) * pow(1 - p, n - k);
 }
 
-double geometrical(const unsigned int& n, const double& p) {
+inline double geometrical(const unsigned int& n, const double& p) {
     // Behaviour change from Vectorgebra/Python --> n == 0 case returns Undefined() for Python version
     if (p < 0 or p > 1 or n == 0) throw RangeError();
     return p * pow(1 - p, n);
 }
 
-double __cumdiv(const double& x, const unsigned int& power) {
+inline double __cumdiv(const double& x, const unsigned int& power) {
     double factor = 1;
     for (unsigned int i = power; i > 0; i--) {
         factor *= x/i;
@@ -167,7 +170,7 @@ double __cumdiv(const double& x, const unsigned int& power) {
     return factor;
 }
 
-double e(const double& x, const unsigned int& resolution = 15) {
+inline double e(const double& x, const unsigned int& resolution = 15) {
     if (resolution == 0) throw RangeError();
     double sum = 1;
     for (int i = 1; i < resolution; i++) {
@@ -177,29 +180,29 @@ double e(const double& x, const unsigned int& resolution = 15) {
     return sum;
 }
 
-double poisson(const unsigned int& k, const double& l) {
+inline double poisson(const unsigned int& k, const double& l) {
     if (l < 0 or k < 0) throw RangeError();
     return pow(l, k) * e(-l) / factorial(k);
 }
 
-double normal(const double& x, const unsigned int& resolution = 15) {
+inline double normal(const double& x, const unsigned int& resolution = 15) {
     return e(-pow(x, 2) / 2, resolution) / sqrt2PI;
 }
 
-double gaussian(const double& x, const double& mean = 0, const double& sigma = 1, const unsigned int& resolution = 15) {
+inline double gaussian(const double& x, const double& mean = 0, const double& sigma = 1, const unsigned int& resolution = 15) {
     // Default case, which is non-existent in Vectorgebra/Python, is a normal distribution
     double coef = 1 / (sqrt2PI * sigma);
     double power = - pow(x - mean, 2) / (2 * pow(sigma, 2));
     return coef * e(power, resolution);
 }
 
-double laplace(const double& x, const double& sigma, const unsigned int& resolution = 15) {
+inline double laplace(const double& x, const double& sigma, const unsigned int& resolution = 15) {
     double coef = 1 / (sqrt2 * sigma);
     double power = - (sqrt2 / sigma) * abs(x);
     return coef * e(power, resolution);
 }
 
-double sin(const double& x, const unsigned int& resolution = 10) {
+inline double sin(const double& x, const unsigned int& resolution = 10) {
     if (resolution == 0) throw RangeError();
     double temp = (x - 360 * floor(x / 360)) * DtoR;
     double sum = 0;
@@ -209,7 +212,7 @@ double sin(const double& x, const unsigned int& resolution = 10) {
     return sum;
 }
 
-double cos(const double& x, const unsigned int& resolution = 10) {
+inline double cos(const double& x, const unsigned int& resolution = 10) {
     if (resolution == 0) throw RangeError();
     double temp = (x - 360 * floor(x / 360)) * DtoR;
     double sum = 1;
@@ -219,43 +222,43 @@ double cos(const double& x, const unsigned int& resolution = 10) {
     return sum;
 }
 
-double tan(const double& x, const unsigned int& resolution = 10) {
+inline double tan(const double& x, const unsigned int& resolution = 10) {
     if (resolution == 0) throw RangeError();
     double c = cos(x, resolution);
     if (c == 0) throw ZeroDivisionError();
     return sin(x, resolution) / c;
 }
 
-double cot(const double& x, const unsigned int& resolution = 10) {
+inline double cot(const double& x, const unsigned int& resolution = 10) {
     if (resolution == 0) throw RangeError();
     double s = sin(x, resolution);
     if (s == 0) throw ZeroDivisionError();
     return cos(x, resolution) / s;
 }
 
-double sinh(const double& x, const unsigned int& resolution = 15) {
+inline double sinh(const double& x, const unsigned int& resolution = 15) {
     if (resolution == 0) throw RangeError();
     return (e(x, resolution) - e(-x, resolution)) / 2;
 }
 
-double cosh(const double& x, const unsigned int& resolution = 15) {
+inline double cosh(const double& x, const unsigned int& resolution = 15) {
     if (resolution == 0) throw RangeError();
     return (e(x, resolution) + e(-x, resolution)) / 2;
 }
 
-double tanh(const double& x, const unsigned int& resolution = 15) {
+inline double tanh(const double& x, const unsigned int& resolution = 15) {
     if (resolution == 0) throw RangeError();
     return sinh(x, resolution) / cosh(x, resolution); // cosh is never zero
 }
 
-double coth(const double& x, const unsigned int& resolution = 15) {
+inline double coth(const double& x, const unsigned int& resolution = 15) {
     if (resolution == 0) throw RangeError();
     auto s = sinh(x, resolution);
     if (s == 0) throw ZeroDivisionError(); // However, sinh can be zero
     return cosh(x, resolution) / s;
 }
 
-double arcsin(const double& x, const unsigned int& resolution = 15) {
+inline double arcsin(const double& x, const unsigned int& resolution = 15) {
     // For some reason, precision errors are high even if you increase the resolution
     if (resolution <= 1) throw RangeError();
     if (x > 1 or x < -1) throw RangeError();
@@ -268,13 +271,13 @@ double arcsin(const double& x, const unsigned int& resolution = 15) {
     return sol / DtoR;
 }
 
-double arccos(const double& x, const unsigned int& resolution = 15) {
+inline double arccos(const double& x, const unsigned int& resolution = 15) {
     if (resolution <= 1) throw RangeError();
     if (x > 1 or x < -1) throw RangeError();
     return 90 - arcsin(x, resolution);
 }
 
-double log2(double x, const unsigned int& resolution = 15) {
+inline double log2(double x, const unsigned int& resolution = 15) {
     if (resolution <= 1) throw RangeError();
     if (x <= 0) throw RangeError();
     double count = 0;
@@ -293,42 +296,42 @@ double log2(double x, const unsigned int& resolution = 15) {
     return count;
 }
 
-double ln(double x, const unsigned int& resolution = 15) {
+inline double ln(double x, const unsigned int& resolution = 15) {
     if (resolution <= 1) throw RangeError();
     if (x <= 0) throw RangeError();
     return log2(x, resolution) / log2E;
 }
 
-double log10(double x, const unsigned int& resolution = 15) {
+inline double log10(double x, const unsigned int& resolution = 15) {
     if (resolution <= 1) throw RangeError();
     if (x <= 0) throw RangeError();
     return log2(x, resolution) / log2_10;
 }
 
-double log(double x, double base = 2, const unsigned int& resolution = 15) {
+inline double log(double x, double base = 2, const unsigned int& resolution = 15) {
     if (resolution <= 1) throw RangeError();
     if (x <= 0) throw RangeError();
     if (base <= 0 or base == 1) throw RangeError();
     return log2(x, resolution) / log2(base, resolution);
 }
 
-double sigmoid(const double& x, const double& a, const unsigned int& resolution = 15) {
+inline double sigmoid(const double& x, const double& a, const unsigned int& resolution = 15) {
     return 1 / (1 + e(-a*x, resolution));
 }
 
-double ReLU(const double& x, const double& cutoff = 0, const double& leak = 0) {
+inline double ReLU(const double& x, const double& cutoff = 0, const double& leak = 0) {
     if (x > cutoff) return x;
     if (x > 0) return cutoff;
     return leak * x;
 }
 
 template <typename T, typename U>
-double derivative(fp<T, U> f, const double& a, const double& h = 0.0000000001) {
+inline double derivative(fp<T, U> f, const double& a, const double& h = 0.0000000001) {
     return (f(a + h) - f(a)) / h;
 }
 
 template <typename T, typename U>
-double integrate(fp<T, U> f, double a, double b, const double& delta = 0.01) {
+inline double integrate(fp<T, U> f, double a, double b, const double& delta = 0.01) {
     if (delta <= 0) throw RangeError();
     if (a == b) return 0;
     auto half = delta / 2;
@@ -347,7 +350,7 @@ double integrate(fp<T, U> f, double a, double b, const double& delta = 0.01) {
 }
 
 template <typename T, typename U>
-double findsol(fp<T, U> f, double x=0, const unsigned int& resolution = 15) {
+inline double findsol(fp<T, U> f, double x=0, const unsigned int& resolution = 15) {
     for (int i = 0; i < resolution; i++) {
         x = x - (f(x) / derivative(f, x));
     }
@@ -355,7 +358,7 @@ double findsol(fp<T, U> f, double x=0, const unsigned int& resolution = 15) {
 }
 
 template <typename T, typename U>
-double Sum(fp<T, U> f, double a, const double& b, const double& step = 1, const bool& control = false, const double& limiter = 0.0000001) {
+inline double Sum(fp<T, U> f, double a, const double& b, const double& step = 1, const bool& control = false, const double& limiter = 0.0000001) {
     if (b < a) throw RangeError();
     double sum = 0;
     if (control) {
@@ -376,7 +379,7 @@ double Sum(fp<T, U> f, double a, const double& b, const double& step = 1, const 
 }
 
 template <typename T>
-T maximum(const unsigned int& amount, T* array) {
+inline T maximum(const unsigned int& amount, T* array) {
     if (amount <= 0) throw RangeError();
     T maxima = *array;
     for (int i = 1; i < amount; i++) {
@@ -386,7 +389,7 @@ T maximum(const unsigned int& amount, T* array) {
 }
 
 template <typename T>
-T minimum(const unsigned int& amount, T* array) {
+inline T minimum(const unsigned int& amount, T* array) {
     if (amount <= 0) throw RangeError();
     T minima = *array;
     for (int i = 1; i < amount; i++) {

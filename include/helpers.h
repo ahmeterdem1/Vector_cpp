@@ -2,6 +2,8 @@
 // Created by AHMET ERDEM on 19.01.2024.
 //
 
+#pragma once
+
 #ifndef VECTOR_CPP_HELPERS_H
 #define VECTOR_CPP_HELPERS_H
 
@@ -47,7 +49,7 @@
 #define BOLDCYAN    "\033[1m\033[36m"
 #define BOLDWHITE   "\033[1m\033[37m"
 
-#include "exceptions.h"
+#include "./exceptions.h"
 #include <ostream>
 #include <cstdio>
 #include <ctime>
@@ -105,7 +107,12 @@ public:
 
     explicit NaN (const unsigned int& s);
 
-    friend std::ostream& operator<< (std::ostream& o, const NaN& n);
+    friend std::ostream& operator<< (std::ostream& o, const NaN& n) {
+        if (n.state == 0) o << "Infinity(-)";
+        else if (n.state == 1) o << "Infinity(+)";
+        else o << "Undefined";
+        return o;
+    };
 
     NaN operator+ (const NaN& n) const;
 
@@ -113,7 +120,9 @@ public:
     NaN operator+ (const T& anything) const;
 
     template <typename T>
-    friend NaN operator+ (const T& anything, const NaN& n);
+    friend NaN operator+ (const T& anything, const NaN& n) {
+        return NaN(n.state);
+    };
 
     NaN operator- (const NaN& n) const;
 
@@ -121,7 +130,11 @@ public:
     NaN operator- (const T& anything) const;
 
     template <typename T>
-    friend NaN operator- (const T& anything, const NaN& n);
+    friend NaN operator- (const T& anything, const NaN& n) {
+        if (n.state == 2) return undefined;
+        if (n.state == 1) return NaN(0);
+        return NaN(1);
+    };
 
     NaN operator* (const NaN& n) const;
 
@@ -129,7 +142,15 @@ public:
     NaN operator* (const T& anything) const;
 
     template <typename T>
-    friend NaN operator* (const T& anything, const NaN& n);
+    friend NaN operator* (const T& anything, const NaN& n) {
+        if (n.state == 2) return undefined;
+        if (anything > 0) return NaN(n.state);
+        if (anything < 0) {
+            if (n.state == 1) return NaN(0);
+            return NaN(1);
+        }
+        if (anything == 0) return undefined;
+    };
 
     NaN operator/ (const NaN& n) const;
 
@@ -137,7 +158,9 @@ public:
     NaN operator/ (const T& anything) const;
 
     template <typename T>
-    friend NaN operator/ (const T& anything, const NaN& n);
+    friend NaN operator/ (const T& anything, const NaN& n) {
+        return undefined;
+    };
 
     template <typename T>
     NaN operator== (const T& anything) const;
@@ -166,12 +189,12 @@ public:
     bool operator<= (const T& anything) const;
 };
 
-NaN Infinity(const bool& sign = true) {
+inline NaN Infinity(const bool& sign = true) {
     if (sign) return NaN(1);
     return NaN(0);
 }
 
-NaN Undefined() {
+inline NaN Undefined() {
     return undefined;
 }
 
