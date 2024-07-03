@@ -30,12 +30,20 @@ the first choice of the compiler.
 For this reason, a subversion of Vectorgebra as Neongebra will be created on top of existing
 code. Currently, some incomplete implementations exist for vector objects.
 
-Important point, I did not yet decide if I should make Neon supported vectors a subclass of
-already existing Vector class. Same for matrices in the future. Current code is not a subclass
-of already existing data classes. No matter what, I will have to create new algorithms for
-each important method for linear algebra. Might just as well create new classes.
+A makefile is given for the existing Neongebra code, you can test it and compare it with
+default Vectorgebra. You can also test it with optimization flags for g++. 
 
-You can see the code in the properly named folder.
+My measurements
+yielded the exact same performance with the compiler with given optimization flags for dot
+prodcut operation. And Neongebra was around 2 times faster than the native compiler optimized
+output for vector length measurement. For vector addition, Neongebra was more than 20 times 
+faster than the compiler with optimization flags.
+
+Of course, all this may just indicate how bad was Vectorgebra... But, I don't think so!
+Vector addition is less than 10 lines of code. It is indeed very hard to mess up this
+little amount of code I guess.
+
+You can see all the code in the properly named folder.
 
 ## File Structure
 
