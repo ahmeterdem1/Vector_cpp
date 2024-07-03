@@ -19,6 +19,24 @@ to be ~4600 times faster in Vectorgebra/C++ than Vectorgebra/Python3.11. Determi
 is of course calculated via the echelon method. Analytic would never return regardless
 of the language.
 
+## Neongebra
+
+I started to develop an Arm Neon native version for Vectorgebra. To squeeze out more
+speed from C++, it is essential to use SIMD optimizations. When compiled with proper flags,
+g++ in itself introduces some level of SIMD. I did not inspect any output files from the
+compiler but, due to the way that loops are coded in this library, I don't think SIMD is
+the first choice of the compiler.
+
+For this reason, a subversion of Vectorgebra as Neongebra will be created on top of existing
+code. Currently, some incomplete implementations exist for vector objects.
+
+Important point, I did not yet decide if I should make Neon supported vectors a subclass of
+already existing Vector class. Same for matrices in the future. Current code is not a subclass
+of already existing data classes. No matter what, I will have to create new algorithms for
+each important method for linear algebra. Might just as well create new classes.
+
+You can see the code in the properly named folder.
+
 ## File Structure
 
 There are a total of 9 header files. _vectorgebra.h_ is the file that collects all the 
