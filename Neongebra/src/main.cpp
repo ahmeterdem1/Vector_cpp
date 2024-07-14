@@ -2,11 +2,6 @@
 #include "../include/vectorgebra.h"
 #include <chrono>
 
-double polynomial(double x) {
-    return pow(x, 2) - 2 * x + 1;
-}
-
-
 int main() {
     srand(unsigned(int(time(0))));
 

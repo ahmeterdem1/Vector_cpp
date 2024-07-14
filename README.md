@@ -35,15 +35,28 @@ default Vectorgebra. You can also test it with optimization flags for g++.
 
 My measurements
 yielded the exact same performance with the compiler with given optimization flags for dot
-prodcut operation. And Neongebra was around 2 times faster than the native compiler optimized
+product operation. And Neongebra was around 2 times faster than the native compiler optimized
 output for vector length measurement. For vector addition, Neongebra was more than 20 times 
-faster than the compiler with optimization flags.
+faster than the compiler with optimization flags (int8 datatype).
 
 Of course, all this may just indicate how bad was Vectorgebra... But, I don't think so!
 Vector addition is less than 10 lines of code. It is indeed very hard to mess up this
 little amount of code I guess.
 
 You can see all the code in the properly named folder.
+
+### Algorithms for Larger Datatypes
+
+With the introduction of int16 datatype to accelerated vector types, algorithms change a
+little bit. Normally for 8-bit datatypes, vector algebra operations were all done in
+loops where the increment was 16. Because a Q register can hold 16 of 8-bit values, 
+ARM Neon is able to do 16 operations at a time at each iteration. Now, for the 16-bit
+datatypes, naturally this count decreases to 8.
+
+I have changed the algorithms to make it 16 again. At each iteration, 2 Q registers
+are loaded. Operations then are carried as normal, done separately on both registers.
+This decreases the total amount of load-store operations each by 1 per iteration in total,
+and total iteration count halves. Another bit of time gain is introduced by this change.
 
 ## File Structure
 

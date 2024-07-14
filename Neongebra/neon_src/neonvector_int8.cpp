@@ -2,16 +2,18 @@
 // Created by AHMET ERDEM on 2.07.2024.
 //
 
-#include "../include/neonvector_int8.h"
+#include "../neon_include/neonvector_int8.h"
+#include "../include/functions.h"
+#include <algorithm>  // The std::move version that append uses comes from here
 
 
-vector_int8::vector_int8() {
+vector_int8::vector_int8() noexcept {
     this->size = 64;
     this->length = 0;
     this->data = new int8_t[this->size];  // Do not put 64 in there, no need to instantiate another int in runtime.
 }
 
-vector_int8::vector_int8(unsigned int data_size, int8_t *data) {
+vector_int8::vector_int8(unsigned int data_size, int8_t *data) noexcept {
     /*
      * In the original Vectorgebra implementation, for the data, just the pointer
      * is copied to this->data. Here, it is changed. A hard copy is done with Q
@@ -33,7 +35,7 @@ vector_int8::vector_int8(unsigned int data_size, int8_t *data) {
     }
 }
 
-vector_int8::vector_int8(int8_t *data, unsigned int data_size, unsigned int data_length) {
+vector_int8::vector_int8(int8_t *data, unsigned int data_size, unsigned int data_length) noexcept {
     this->size = data_size;
     this->length = data_length;
     this->data = data;
@@ -46,7 +48,7 @@ int8_t vector_int8::operator[] (int index) const {
     return *(this->data + index);
 }
 
-double vector_int8::len() const {
+double vector_int8::len() const noexcept {
     unsigned int counter = 0;
 
     int16x8_t temp_holder;  // This is to prevent multiple load operations in each loop
@@ -60,7 +62,6 @@ double vector_int8::len() const {
     for(; counter < this->length - this->length % 16; counter += 16) {
         temp_holder = vld1q_s8(this->data + counter);
         sum64 = vaddq_s64(vpaddlq_s32(vpaddlq_s16(vpaddlq_s8(vmulq_s8(temp_holder, temp_holder)))), sum64);
-
     }
 
     vst1_lane_s32(&sum_holder, vreinterpret_s32_s64(vadd_s64(vget_low_s64(sum64), vget_high_s64(sum64))), 0);
@@ -70,10 +71,10 @@ double vector_int8::len() const {
         sum += *(this->data + counter) * *(this->data + counter);
     }
 
-    return sqrt(sum);
+    return std::sqrt(sum);  // std:: there to differentiate from the Vectorgebra sqrt
 }
 
-void vector_int8::resize() {
+void vector_int8::resize() noexcept {
     unsigned int diff = this->size - this->length;
     diff = (diff % 64) * 64;  // Decrease the size by this amount.
 
@@ -96,11 +97,11 @@ void vector_int8::resize() {
     this->data = new_data;
 }
 
-vector_int8 vector_int8::copy() const {
+vector_int8 vector_int8::copy() const noexcept {
     return vector_int8(this->length, this->data);  // Constructor already does a hard copy
 }
 
-void vector_int8::append(const int8_t& item) {
+void vector_int8::append(const int8_t& item) noexcept {
 
     if (this->length < this->size) {
         this->data[this->length] = item;
@@ -125,7 +126,7 @@ int8_t vector_int8::pop(int index) {
 
     int8_t r_value = *(this->data + index);
 
-    int i = index;
+    unsigned int i = index;
     for (; i < this->length - 17; i += 16) {
         vst1q_s8(this->data + i, vld1q_s8(this->data + i + 1));
     }
@@ -137,7 +138,7 @@ int8_t vector_int8::pop(int index) {
     return r_value;
 }
 
-vector_int8 vector_int8::clear() {
+vector_int8 vector_int8::clear() noexcept {
     delete[] this->data;
     this->size = 64;
     this->data = new int8_t[this->size];
@@ -160,7 +161,7 @@ vector_int8 vector_int8::operator+(const vector_int8& v) const {
     return vector_int8(dest, this->size, this->length);
 }
 
-vector_int8 vector_int8::operator+(const int8_t& c) const {
+vector_int8 vector_int8::operator+(const int8_t& c) const noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
 
     int8_t* dest = new int8_t[this->size];
@@ -172,7 +173,7 @@ vector_int8 vector_int8::operator+(const int8_t& c) const {
     return vector_int8(dest, this->size, this->length);
 }
 
-vector_int8 vector_int8::operator+=(const int8_t& c) {
+vector_int8 vector_int8::operator+=(const int8_t& c) noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
 
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
@@ -202,7 +203,7 @@ vector_int8 vector_int8::operator-(const vector_int8& v) const {
     return vector_int8(dest, this->size, this->length);
 }
 
-vector_int8 vector_int8::operator-(const int8_t& c) const {
+vector_int8 vector_int8::operator-(const int8_t& c) const noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
 
     int8_t* dest = new int8_t[this->size];
@@ -214,7 +215,7 @@ vector_int8 vector_int8::operator-(const int8_t& c) const {
     return vector_int8(dest, this->size, this->length);
 }
 
-vector_int8 vector_int8::operator-=(const int8_t& c) {
+vector_int8 vector_int8::operator-=(const int8_t& c) noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
 
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
@@ -225,6 +226,8 @@ vector_int8 vector_int8::operator-=(const int8_t& c) {
 }
 
 vector_int8 vector_int8::operator-=(const vector_int8& v) {
+    if (this->length != v.length) throw DimensionError();
+
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
         vst1q_s8(this->data + counter, vsubq_s8(vld1q_s8(this->data + counter), vld1q_s8(v.data + counter)));
     }
@@ -232,14 +235,14 @@ vector_int8 vector_int8::operator-=(const vector_int8& v) {
     return *this;
 }
 
-vector_int8 vector_int8::operator-() const {
+vector_int8 vector_int8::operator-() const noexcept {
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
         vst1q_s8(this->data + counter, vnegq_s8(vld1q_s8(this->data + counter)));
     }
     return *this;
 }
 
-vector_int8 vector_int8::operator*(const int8_t& c) const {
+vector_int8 vector_int8::operator*(const int8_t& c) const noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
 
     int8_t* dest = new int8_t[this->size];
@@ -262,7 +265,7 @@ vector_int8 vector_int8::operator*(const vector_int8& v) const {
     return vector_int8(dest, this->size, this->length);
 }
 
-vector_int8 vector_int8::operator*=(const int8_t& c) {
+vector_int8 vector_int8::operator*=(const int8_t& c) noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
 
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
@@ -273,6 +276,8 @@ vector_int8 vector_int8::operator*=(const int8_t& c) {
 }
 
 vector_int8 vector_int8::operator*=(const vector_int8& v) {
+    if (this->length != v.length) throw DimensionError();
+
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
         vst1q_s8(this->data + counter, vmulq_s8(vld1q_s8(this->data + counter), vld1q_s8(v.data + counter)));
     }
@@ -280,17 +285,17 @@ vector_int8 vector_int8::operator*=(const vector_int8& v) {
     return *this;
 }
 
-vector_int8 vector_int8::operator++() {
+vector_int8 vector_int8::operator++() noexcept {
     int8x16_t scalar = vdupq_n_s8(1);
 
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
-        vst1q_s8(this->data + counter, vmulq_s8(vld1q_s8(this->data + counter), scalar));
+        vst1q_s8(this->data + counter, vaddq_s8(vld1q_s8(this->data + counter), scalar));
     }
 
     return *this;
 }
 
-vector_int8 vector_int8::operator--() {
+vector_int8 vector_int8::operator--() noexcept {
     int8x16_t scalar = vdupq_n_s8(1);
 
     for (unsigned int counter = 0; counter < this->size; counter += 16) {
@@ -300,15 +305,15 @@ vector_int8 vector_int8::operator--() {
     return *this;
 }
 
-unsigned int vector_int8::__pivot(const double& limiter) const {
+unsigned int vector_int8::__pivot(const double& limiter) const noexcept {
     if (this->length == 0) return 0;
-    for (int i = 0; i < this->length; i++) {
+    for (unsigned int i = 0; i < this->length; i++) {
         if (abs(*(this->data + i)) > limiter) return i;
     }
     return this->length;
 }
 
-bool vector_int8::operator==(const int8_t& c) const {
+bool vector_int8::operator==(const int8_t& c) const noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
     int8x16_t control = vdupq_n_s8(0xFF);
 
@@ -345,7 +350,7 @@ bool vector_int8::operator==(const vector_int8& v) const {
     return true;
 }
 
-bool vector_int8::operator!=(const int8_t& c) const {
+bool vector_int8::operator!=(const int8_t& c) const noexcept {
     int8x16_t scalar = vdupq_n_s8(c);
     int8x16_t control = vdupq_n_s8(0xFF);
 
@@ -382,35 +387,35 @@ bool vector_int8::operator!=(const vector_int8& v) const {
     return true;
 }
 
-bool vector_int8::operator<(const int8_t& c) const {
+bool vector_int8::operator<(const int8_t& c) const noexcept {
     return (this->len() < c);
 }
 
-bool vector_int8::operator<(const vector_int8& v) const {
+bool vector_int8::operator<(const vector_int8& v) const noexcept {
     return (this->len() < v.len());
 }
 
-bool vector_int8::operator<=(const int8_t& c) const {
+bool vector_int8::operator<=(const int8_t& c) const noexcept {
     return (this->len() <= c);
 }
 
-bool vector_int8::operator<=(const vector_int8& v) const {
+bool vector_int8::operator<=(const vector_int8& v) const noexcept {
     return (this->len() <= v.len());
 }
 
-bool vector_int8::operator>(const int8_t& c) const {
+bool vector_int8::operator>(const int8_t& c) const noexcept {
     return (this->len() > c);
 }
 
-bool vector_int8::operator>(const vector_int8& v) const {
+bool vector_int8::operator>(const vector_int8& v) const noexcept {
     return (this->len() > v.len());
 }
 
-bool vector_int8::operator>=(const int8_t& c) const {
+bool vector_int8::operator>=(const int8_t& c) const noexcept {
     return (this->len() >= c);
 }
 
-bool vector_int8::operator>=(const vector_int8& v) const {
+bool vector_int8::operator>=(const vector_int8& v) const noexcept {
     return (this->len() >= v.len());
 }
 
@@ -452,18 +457,31 @@ void vector_int8::swap(const unsigned int &first, const unsigned int &second) {
 }
 
 vector_int8 vector_int8::zero(const unsigned int& dim) {
-    int8_t *temp = new int8_t[dim];
-    for (int i = 0; i < dim; i++) {
+    if (dim < 0) throw RangeError();
+    const unsigned int size = 64 * (floor(dim / 64) + 1);
+    int8_t *temp = new int8_t[size];
+    for (unsigned int i = 0; i < dim; i++) {
         *(temp + i) = 0;
     }
-    return vector_int8(temp, 64 * (floor(dim / 64) + 1), dim);
+    return vector_int8(temp, size, dim);
 }
 
 vector_int8 vector_int8::one(const unsigned int& dim) {
-    int8_t *temp = new int8_t[dim];
-    for (int i = 0; i < dim; i++) {
+    if (dim < 0) throw RangeError();
+    const unsigned int size = 64 * (floor(dim / 64) + 1);
+    int8_t *temp = new int8_t[size];
+    for (unsigned int i = 0; i < dim; i++) {
         *(temp + i) = 1;
     }
-    return vector_int8(temp, 64 * (floor(dim / 64) + 1), dim);
+    return vector_int8(temp, size, dim);
 }
 
+vector_int8 vector_int8::randv(const unsigned int &dim, const int8_t &low, const int8_t &high) {
+    if (dim < 0 or low >= high) throw RangeError();
+    const unsigned int size = 64 * (floor(dim / 64) + 1);
+    int8_t *temp = new int8_t[size];
+    for (unsigned int i = 0; i < dim; i++) {
+        *(temp + i) = randint(low, high);
+    }
+    return vector_int8(temp, size, dim);
+}

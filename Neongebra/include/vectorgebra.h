@@ -8,7 +8,9 @@
 #include <thread>
 
 // Neongebra imports
-#include "./neonvector_int8.h"
+#include "../neon_include/neonvector_int8.h"
+#include "../neon_include/neonvector_uint8.h"
+#include "../neon_include/neonvector_int16.h"
 
 inline void __muld(Vector<double>** data1, const double* data2, const int id, unsigned int count, unsigned int stop, double* target) {
     double sum;
